@@ -307,7 +307,7 @@
 
     <header>
         <div class="logo">SiteCraft</div>
-        <button onclick="window.history.back()" class="back-btn">&larr; Back to Order</button>
+        <a href="index.html" class="back-btn">&larr; Back to Order</a>
     </header>
 
     <main class="checkout-container">
@@ -370,100 +370,104 @@
         <div>Secured by Yoco Payment Gateway.</div>
     </footer>
 
-  <script>
-    const pricingMap = {
-        'landing-page': { name: 'Landing Page / Single Page', price: 500 },
-        'corporate': { name: 'Business / Corporate Website', price: 2500 },
-        'portfolio': { name: 'Personal Portfolio', price: 500 },
-        'custom': { name: 'Custom Web Application', price: 4000 }
-    };
+    <script>
+        const pricingMap = {
+            'landing-page': { name: 'Landing Page / Single Page', price: 500 },
+            'corporate': { name: 'Business / Corporate Website', price: 2500 },
+            'portfolio': { name: 'Personal Portfolio', price: 500 },
+            'custom': { name: 'Custom Web Application', price: 4000 }
+        };
 
-    // Render Service URL
-    const RENDER_BACKEND_URL = 'https://sitecraftdigital.onrender.com/create-checkout';
+        const RENDER_BACKEND_URL = 'https://sitecraftdigital.onrender.com/create-checkout';
 
-    let basePrice = 0;
-    let selectedAddonPrice = 0;
+        let basePrice = 0;
+        let selectedAddonPrice = 0;
 
-    window.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        const clientName = urlParams.get('fullname') || 'Valued Client';
-        const clientEmail = urlParams.get('email') || '';
-        const projectType = urlParams.get('project-type') || 'landing-page';
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            const clientName = urlParams.get('fullname') || 'Valued Client';
+            const clientEmail = urlParams.get('email') || '';
+            const projectType = urlParams.get('project-type') || 'landing-page';
 
-        document.getElementById('display-name').textContent = clientName;
-        document.getElementById('display-email').textContent = clientEmail;
+            document.getElementById('display-name').textContent = clientName;
+            document.getElementById('display-email').textContent = clientEmail;
 
-        if (pricingMap[projectType]) {
-            document.getElementById('display-package').textContent = pricingMap[projectType].name;
-            basePrice = pricingMap[projectType].price;
-            document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
-        } else {
-            document.getElementById('display-package').textContent = 'Custom Web Project';
-            basePrice = 500;
-            document.getElementById('display-base-price').textContent = `R${basePrice}`;
-        }
-
-        updateTotal();
-    });
-
-    function selectAddon(price, element) {
-        document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
-        element.classList.add('selected');
-        selectedAddonPrice = price;
-        updateTotal();
-    }
-
-    function updateTotal() {
-        const grandTotal = basePrice + selectedAddonPrice;
-        document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
-    }
-
-    document.getElementById('checkout-btn').addEventListener('click', async function () {
-        const grandTotal = basePrice + selectedAddonPrice;
-        const totalCents = grandTotal * 100;
-        const btn = this;
-
-        if (grandTotal <= 0) {
-            alert('Invalid payment amount.');
-            return;
-        }
-
-        // Dynamic base URL builder: resolves subfolders properly on GitHub Pages
-        const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
-
-        try {
-            btn.disabled = true;
-            btn.textContent = 'Redirecting to Yoco...';
-
-            // Send request to Render Backend with folder-aware redirect URLs
-            const response = await fetch(RENDER_BACKEND_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amountInCents: totalCents,
-                    currency: 'ZAR',
-                    successUrl: baseUrl + '/success.html',
-                    cancelUrl: baseUrl + '/cancel.html'
-                })
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.redirectUrl) {
-                // Redirect customer to official Yoco payment page
-                window.location.href = data.redirectUrl;
+            if (pricingMap[projectType]) {
+                document.getElementById('display-package').textContent = pricingMap[projectType].name;
+                basePrice = pricingMap[projectType].price;
+                document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
             } else {
-                alert('Failed to initiate checkout: ' + (data.message || data.error || 'Server error'));
+                document.getElementById('display-package').textContent = 'Custom Web Project';
+                basePrice = 500;
+                document.getElementById('display-base-price').textContent = `R${basePrice}`;
+            }
+
+            updateTotal();
+        });
+
+        function selectAddon(price, element) {
+            document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedAddonPrice = price;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const grandTotal = basePrice + selectedAddonPrice;
+            document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
+        }
+
+        document.getElementById('checkout-btn').addEventListener('click', async function () {
+            const grandTotal = basePrice + selectedAddonPrice;
+            const totalCents = grandTotal * 100;
+            const btn = this;
+
+            if (grandTotal <= 0) {
+                alert('Invalid payment amount.');
+                return;
+            }
+
+            // Construct exact GitHub Pages paths to eliminate 404s
+            const currentOrigin = window.location.origin;
+            const isGitHubPages = currentOrigin.includes('github.io');
+            
+            // Appends repository subfolder path if hosted on GitHub Pages
+            const repoPath = isGitHubPages ? '/SiteCraftDigital' : '';
+            
+            const absoluteSuccessUrl = `${currentOrigin}${repoPath}/success.html`;
+            const absoluteCancelUrl = `${currentOrigin}${repoPath}/cancel.html`;
+
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Redirecting to Yoco...';
+
+                const response = await fetch(RENDER_BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amountInCents: totalCents,
+                        currency: 'ZAR',
+                        successUrl: absoluteSuccessUrl,
+                        cancelUrl: absoluteCancelUrl
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    alert('Failed to initiate checkout: ' + (data.message || data.error || 'Server error'));
+                    btn.disabled = false;
+                    btn.textContent = 'Complete Payment via Yoco';
+                }
+            } catch (err) {
+                alert('Connection error: ' + err.message);
                 btn.disabled = false;
                 btn.textContent = 'Complete Payment via Yoco';
             }
-        } catch (err) {
-            alert('Connection error: ' + err.message);
-            btn.disabled = false;
-            btn.textContent = 'Complete Payment via Yoco';
-        }
-    });
-</script>
+        });
+    </script>
 </body>
 </html>
