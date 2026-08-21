@@ -255,6 +255,41 @@
             color: var(--accent-orange);
         }
 
+        /* Terms & Conditions Checkbox Styling */
+        .terms-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+        }
+
+        .terms-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-orange);
+            cursor: pointer;
+        }
+
+        .terms-group label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .terms-group a {
+            color: var(--accent-cyan);
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .terms-group a:hover {
+            color: var(--accent-orange);
+        }
+
         .pay-btn {
             width: 100%;
             padding: 1.2rem;
@@ -266,19 +301,20 @@
             text-transform: uppercase;
             border-radius: 50px;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            margin-top: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+            margin-top: 1.2rem;
             font-size: 1rem;
         }
 
-        .pay-btn:hover {
+        .pay-btn:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(255, 94, 54, 0.4);
         }
 
         .pay-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.4;
             cursor: not-allowed;
+            background: var(--text-muted);
         }
 
         footer {
@@ -361,7 +397,16 @@
                 <span class="total-amount" id="display-total">R0</span>
             </div>
 
-            <button class="pay-btn" id="checkout-btn">Complete Payment via Yoco</button>
+            <!-- Terms and Conditions Checkbox -->
+            <div class="terms-group">
+                <input type="checkbox" id="terms-checkbox">
+                <label for="terms-checkbox">
+                    I agree to the <a href="main/termsandconditions.html" target="_blank">Terms & Conditions</a> and <a href="main/termsandconditions.html" target="_blank">Refund Policy</a>.
+                </label>
+            </div>
+
+            <!-- Disabled Payment Button -->
+            <button class="pay-btn" id="checkout-btn" disabled>Complete Payment via Yoco</button>
         </div>
     </main>
 
@@ -406,6 +451,14 @@
             updateTotal();
         });
 
+        // Enable/Disable Payment Button based on checkbox status
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const checkoutBtn = document.getElementById('checkout-btn');
+
+        termsCheckbox.addEventListener('change', function() {
+            checkoutBtn.disabled = !this.checked;
+        });
+
         function selectAddon(price, element) {
             document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
@@ -418,7 +471,7 @@
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
         }
 
-        document.getElementById('checkout-btn').addEventListener('click', async function () {
+        checkoutBtn.addEventListener('click', async function () {
             const grandTotal = basePrice + selectedAddonPrice;
             const totalCents = grandTotal * 100;
             const btn = this;
@@ -428,11 +481,8 @@
                 return;
             }
 
-            // Construct exact GitHub Pages paths to eliminate 404s
             const currentOrigin = window.location.origin;
             const isGitHubPages = currentOrigin.includes('github.io');
-            
-            // Appends repository subfolder path if hosted on GitHub Pages
             const repoPath = isGitHubPages ? '/SiteCraftDigital' : '';
             
             const absoluteSuccessUrl = `${currentOrigin}${repoPath}/success.html`;
