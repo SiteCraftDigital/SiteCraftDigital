@@ -432,7 +432,7 @@
             publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
         });
 
-        document.getElementById('checkout-btn').addEventListener('click', function () {
+      document.getElementById('checkout-btn').addEventListener('click', function () {
             const grandTotal = basePrice + selectedAddonPrice;
 
             sdk.inline({
@@ -449,6 +449,33 @@
                     }
                 }
             });
+        });
+```[cite: 3]
+
+---
+
+### What to Paste In Its Place
+
+Paste this updated `sdk.showPopup()` code block directly over lines 280–305:
+
+```javascript
+        document.getElementById('checkout-btn').addEventListener('click', function () {
+            const grandTotal = basePrice + selectedAddonPrice;
+
+            sdk.showPopup({
+                amountInCents: grandTotal * 100,
+                currency: 'ZAR',
+                name: 'SiteCraft Digital',
+                description: 'Web Development Deposit',
+                callback: function (result) {
+                    if (result.error) {
+                        alert('Payment Failed: ' + result.error.message);
+                    } else {
+                        alert('Payment Successful! Token: ' + result.id + '\nThank you for commissioning SiteCraft Digital.');
+                    }
+                }
+            });
+        });
         });
     </script>
 </body>
