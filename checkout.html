@@ -38,7 +38,6 @@
             line-height: 1.6;
         }
 
-        /* Animated Canvas Background */
         .bg-canvas {
             position: fixed;
             top: 0;
@@ -90,7 +89,6 @@
             100% { transform: translate(-50px, 100px) scale(0.9) rotate(360deg); }
         }
 
-        /* Header */
         header {
             display: flex;
             justify-content: space-between;
@@ -136,7 +134,6 @@
             color: var(--accent-cyan);
         }
 
-        /* Checkout Layout */
         .checkout-container {
             min-height: 100vh;
             padding: 10rem 5% 6rem;
@@ -162,7 +159,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Order Details Summary */
         .summary-box {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--glass-border);
@@ -187,7 +183,6 @@
             padding-bottom: 0.8rem;
         }
 
-        /* Add-ons Selector */
         .addons-title {
             font-family: var(--font-heading);
             font-size: 1.2rem;
@@ -238,7 +233,6 @@
             font-size: 0.85rem;
         }
 
-        /* Total Calculation Bar */
         .total-bar {
             display: flex;
             justify-content: space-between;
@@ -262,7 +256,6 @@
             color: var(--accent-orange);
         }
 
-        /* Pay Button */
         .pay-btn {
             width: 100%;
             padding: 1.2rem;
@@ -317,7 +310,6 @@
         <div class="checkout-card">
             <h1 class="section-title">Order Summary & Checkout</h1>
 
-            <!-- Order Info Display -->
             <div class="summary-box">
                 <div class="summary-row main-pkg">
                     <span id="display-package">Website Package</span>
@@ -333,7 +325,6 @@
                 </div>
             </div>
 
-            <!-- Maintenance Addons -->
             <h3 class="addons-title">Select Maintenance Add-On</h3>
             <div class="addons-grid">
                 <label class="addon-option selected" onclick="selectAddon(0, this)">
@@ -361,7 +352,6 @@
                 </label>
             </div>
 
-            <!-- Dynamic Total Price -->
             <div class="total-bar">
                 <span class="total-label">Total Amount Due</span>
                 <span class="total-amount" id="display-total">R0</span>
@@ -422,10 +412,9 @@
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
         }
 
-        // Initialize Yoco SDK Instance safely
         let yoco;
         try {
-            yoco = new YocoSDK({
+            yoco = new window.YocoSDK({
                 publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
             });
         } catch (e) {
@@ -434,24 +423,29 @@
 
         document.getElementById('checkout-btn').addEventListener('click', function () {
             if (typeof YocoSDK === 'undefined' || !yoco) {
-                alert('Yoco SDK is still loading or blocked. Please check your internet connection or ad-blocker.');
+                alert('Yoco SDK is still loading or blocked. Please check your internet connection.');
                 return;
             }
 
             const grandTotal = basePrice + selectedAddonPrice;
 
-            // Trigger Yoco Inline Payment Popup Modal
-            yoco.inline({
-                layout: 'field',
+            if (grandTotal <= 0) {
+                alert('Invalid payment amount.');
+                return;
+            }
+
+            // Fixed popup launcher using Yoco SDK showPopup
+            yoco.showPopup({
                 amountInCents: grandTotal * 100,
                 currency: 'ZAR',
                 name: 'SiteCraft Digital',
-                description: 'Web Development Deposit',
+                description: 'Web Development Payment',
                 callback: function (result) {
                     if (result.error) {
                         alert('Payment Error: ' + result.error.message);
                     } else {
-                        alert('Payment Successful!\nCard Token: ' + result.id);
+                        alert('Payment Successful!\nTransaction Reference: ' + result.id);
+                        window.location.href = 'index.html';
                     }
                 }
             });
