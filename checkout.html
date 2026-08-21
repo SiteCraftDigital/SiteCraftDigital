@@ -501,28 +501,28 @@
         let basePrice = 0;
         let selectedAddonPrice = 0;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            const clientName = urlParams.get('fullname') || 'Valued Client';
-            const clientEmail = urlParams.get('email') || '';
-            const projectType = urlParams.get('project-type') || 'landing-page';
+      window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    const clientName = urlParams.get('fullname') || localStorage.getItem('checkout_name') || 'Valued Client';
+    const clientEmail = urlParams.get('email') || localStorage.getItem('checkout_email') || '';
+    const projectType = urlParams.get('project-type') || localStorage.getItem('checkout_type') || 'landing-page';
 
-            document.getElementById('display-name').textContent = clientName;
-            document.getElementById('display-email').textContent = clientEmail;
+    document.getElementById('display-name').textContent = clientName;
+    document.getElementById('display-email').textContent = clientEmail;
 
-            if (pricingMap[projectType]) {
-                document.getElementById('display-package').textContent = pricingMap[projectType].name;
-                basePrice = pricingMap[projectType].price;
-                document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
-            } else {
-                document.getElementById('display-package').textContent = 'Custom Web Project';
-                basePrice = 500;
-                document.getElementById('display-base-price').textContent = `R${basePrice}`;
-            }
+    if (pricingMap[projectType]) {
+        document.getElementById('display-package').textContent = pricingMap[projectType].name;
+        basePrice = pricingMap[projectType].price;
+        document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
+    } else {
+        document.getElementById('display-package').textContent = 'Custom Web Project';
+        basePrice = 500;
+        document.getElementById('display-base-price').textContent = `R${basePrice}`;
+    }
 
-            updateTotal();
-        });
+    updateTotal();
+});
 
         const termsCheckbox = document.getElementById('terms-checkbox');
         const checkoutBtn = document.getElementById('checkout-btn');
