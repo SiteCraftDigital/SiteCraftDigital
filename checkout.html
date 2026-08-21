@@ -255,7 +255,6 @@
             color: var(--accent-orange);
         }
 
-        /* Terms & Conditions Checkbox Styling */
         .terms-group {
             display: flex;
             align-items: center;
@@ -280,13 +279,14 @@
             cursor: pointer;
         }
 
-        .terms-group a {
+        .terms-link {
             color: var(--accent-cyan);
             text-decoration: underline;
+            cursor: pointer;
             transition: color 0.2s;
         }
 
-        .terms-group a:hover {
+        .terms-link:hover {
             color: var(--accent-orange);
         }
 
@@ -317,6 +317,70 @@
             background: var(--text-muted);
         }
 
+        /* Modal Background Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Modal Box */
+        .modal-card {
+            background: #0d0c15;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 850px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-card iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #ffffff;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            background: #14131d;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .close-modal-btn {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-purple));
+            color: #ffffff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .close-modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 94, 54, 0.4);
+        }
+
         footer {
             padding: 4rem 5%;
             border-top: 1px solid var(--glass-border);
@@ -330,6 +394,7 @@
         @media (max-width: 600px) {
             .checkout-card { padding: 1.5rem; }
             .total-bar { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .modal-card { height: 85vh; }
         }
     </style>
 </head>
@@ -397,18 +462,26 @@
                 <span class="total-amount" id="display-total">R0</span>
             </div>
 
-            <!-- Terms and Conditions Checkbox -->
             <div class="terms-group">
                 <input type="checkbox" id="terms-checkbox">
                 <label for="terms-checkbox">
-                    I agree to the <a href="terms_and_conditions.html" target="_blank">Terms & Conditions</a> and <a href="terms_and_conditions.html" target="_blank">Refund Policy</a>.
+                    I agree to the <span class="terms-link" onclick="openModal()">Terms & Conditions</span> and <span class="terms-link" onclick="openModal()">Refund Policy</span>.
                 </label>
             </div>
 
-            <!-- Disabled Payment Button -->
             <button class="pay-btn" id="checkout-btn" disabled>Complete Payment via Yoco</button>
         </div>
     </main>
+
+    <!-- Modal Container -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-card">
+            <iframe src="terms_and_conditions.html"></iframe>
+            <div class="modal-footer">
+                <button class="close-modal-btn" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div>&copy; 2026 SiteCraft Digital. All Rights Reserved.</div>
@@ -451,13 +524,23 @@
             updateTotal();
         });
 
-        // Enable/Disable Payment Button based on checkbox status
         const termsCheckbox = document.getElementById('terms-checkbox');
         const checkoutBtn = document.getElementById('checkout-btn');
 
         termsCheckbox.addEventListener('change', function() {
             checkoutBtn.disabled = !this.checked;
         });
+
+        // Modal opening/closing functions
+        function openModal() {
+            document.getElementById('termsModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('termsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
 
         function selectAddon(price, element) {
             document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
