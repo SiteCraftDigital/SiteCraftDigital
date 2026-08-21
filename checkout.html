@@ -377,81 +377,80 @@
     </footer>
 
     <script>
-        // Pricing Table Definition
-        const pricingMap = {
-            'landing-page': { name: 'Landing Page / Single Page', price: 500 },
-            'corporate': { name: 'Business / Corporate Website', price: 2500 },
-            'portfolio': { name: 'Personal Portfolio', price: 500 },
-            'custom': { name: 'Custom Web Application', price: 4000 }
-        };
+    <script>
+    // Pricing Table Definition
+    const pricingMap = {
+        'landing-page': { name: 'Landing Page / Single Page', price: 500 },
+        'corporate': { name: 'Business / Corporate Website', price: 2500 },
+        'portfolio': { name: 'Personal Portfolio', price: 500 },
+        'custom': { name: 'Custom Web Application', price: 4000 }
+    };
 
-        let basePrice = 0;
-        let selectedAddonPrice = 0;
+    let basePrice = 0;
+    let selectedAddonPrice = 0;
 
-        // Load URL Parameters passed from index.html
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            const clientName = urlParams.get('fullname') || 'Valued Client';
-            const clientEmail = urlParams.get('email') || '';
-            const projectType = urlParams.get('project-type') || 'landing-page';
+    // Load URL Parameters passed from index.html
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const clientName = urlParams.get('fullname') || 'Valued Client';
+        const clientEmail = urlParams.get('email') || '';
+        const projectType = urlParams.get('project-type') || 'landing-page';
 
-            document.getElementById('display-name').textContent = clientName;
-            document.getElementById('display-email').textContent = clientEmail;
+        document.getElementById('display-name').textContent = clientName;
+        document.getElementById('display-email').textContent = clientEmail;
 
-            if (pricingMap[projectType]) {
-                document.getElementById('display-package').textContent = pricingMap[projectType].name;
-                basePrice = pricingMap[projectType].price;
-                document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
-            } else {
-                document.getElementById('display-package').textContent = 'Custom Web Project';
-                basePrice = 500;
-                document.getElementById('display-base-price').textContent = `R${basePrice}`;
-            }
-
-            updateTotal();
-        });
-
-        // Toggle maintenance option selection
-        function selectAddon(price, element) {
-            document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedAddonPrice = price;
-            updateTotal();
+        if (pricingMap[projectType]) {
+            document.getElementById('display-package').textContent = pricingMap[projectType].name;
+            basePrice = pricingMap[projectType].price;
+            document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
+        } else {
+            document.getElementById('display-package').textContent = 'Custom Web Project';
+            basePrice = 500;
+            document.getElementById('display-base-price').textContent = `R${basePrice}`;
         }
 
-        // Calculate and render final total
-        function updateTotal() {
-            const grandTotal = basePrice + selectedAddonPrice;
-            document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
-        }
+        updateTotal();
+    });
 
-        // Yoco SDK Integration
-        // Replace 'pk_test_549b6dd4mWKPGLj47ef4' with your actual Yoco Public Key from your Yoco Portal
-        const sdk = new YocoSDK({
-            publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
-        });
+    // Toggle maintenance option selection
+    function selectAddon(price, element) {
+        document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedAddonPrice = price;
+        updateTotal();
+    }
 
-      document.getElementById('checkout-btn').addEventListener('click', function () {
-            const grandTotal = basePrice + selectedAddonPrice;
+    // Calculate and render final total
+    function updateTotal() {
+        const grandTotal = basePrice + selectedAddonPrice;
+        document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
+    }
 
-            sdk.inline({
-                layout: 'field',
-                amountInCents: grandTotal * 100, // Converts ZAR into Cents required by Yoco API
-                currency: 'ZAR',
-                name: 'SiteCraft Digital',
-                description: 'Web Development Deposit',
-                callback: function (result) {
-                    if (result.error) {
-                        alert('Payment Failed: ' + result.error.message);
-                    } else {
-                        alert('Payment Successful! Token: ' + result.id + '\nThank you for commissioning SiteCraft Digital.');
-                    }
+    // Yoco SDK Integration
+    const sdk = new YocoSDK({
+        publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
+    });
+
+    document.getElementById('checkout-btn').addEventListener('click', function (e) {
+        e.preventDefault();
+        const grandTotal = basePrice + selectedAddonPrice;
+
+        sdk.showPopup({
+            amountInCents: grandTotal * 100,
+            currency: 'ZAR',
+            name: 'SiteCraft Digital',
+            description: 'Web Development Deposit',
+            callback: function (result) {
+                if (result.error) {
+                    alert('Payment Failed: ' + result.error.message);
+                } else {
+                    alert('Payment Successful! Token: ' + result.id + '\nThank you for commissioning SiteCraft Digital.');
                 }
-            });
+            }
         });
-```[cite: 3]
-
+    });
+</script>
 ---
 
 ### What to Paste In Its Place
