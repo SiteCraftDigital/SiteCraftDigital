@@ -7,8 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Official Yoco Popup SDK Loader -->
-    <script src="https://plugin.yoco.com/v1/yoco-sdk-web.js"></script>
     <style>
         :root {
             --bg-color: #0b0a10;
@@ -357,7 +355,14 @@
                 <span class="total-amount" id="display-total">R0</span>
             </div>
 
-            <button class="pay-btn" id="checkout-btn">Complete Payment via Yoco</button>
+            <!-- Standard HTML Form Integration for Yoco Gateway -->
+            <form id="yoco-form" method="POST" action="https://pay.yoco.com/sitecraftdigital">
+                <input type="hidden" name="amount" id="yoco-amount" value="0">
+                <input type="hidden" name="currency" value="ZAR">
+                <input type="hidden" name="customerName" id="yoco-name" value="">
+                <input type="hidden" name="customerEmail" id="yoco-email" value="">
+                <button type="button" class="pay-btn" id="checkout-btn">Complete Payment via Yoco</button>
+            </form>
         </div>
     </main>
 
@@ -376,7 +381,6 @@
 
         let basePrice = 0;
         let selectedAddonPrice = 0;
-        let clientEmail = '';
 
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -385,10 +389,14 @@
             const rawEmail = urlParams.get('email') || '';
             const projectType = urlParams.get('project-type') || 'landing-page';
 
-            clientEmail = decodeURIComponent(rawEmail);
+            const nameDecoded = decodeURIComponent(rawName);
+            const emailDecoded = decodeURIComponent(rawEmail);
 
-            document.getElementById('display-name').textContent = decodeURIComponent(rawName);
-            document.getElementById('display-email').textContent = clientEmail || '-';
+            document.getElementById('display-name').textContent = nameDecoded;
+            document.getElementById('display-email').textContent = emailDecoded || '-';
+
+            document.getElementById('yoco-name').value = nameDecoded;
+            document.getElementById('yoco-email').value = emailDecoded;
 
             if (pricingMap[projectType]) {
                 document.getElementById('display-package').textContent = pricingMap[projectType].name;
@@ -413,48 +421,19 @@
         function updateTotal() {
             const grandTotal = basePrice + selectedAddonPrice;
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
+            document.getElementById('yoco-amount').value = grandTotal;
         }
 
-        // Direct Inline Popup Trigger
+        // Direct Payment Link / Fallback Redirect
         document.getElementById('checkout-btn').addEventListener('click', function () {
             const grandTotal = basePrice + selectedAddonPrice;
-
-            // Load dynamically if script hasn't rendered yet
-            function initCheckout() {
-                var yoco = new window.YocoSDK({
-                    publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
-                });
-
-                yoco.showPopup({
-                    amountInCents: grandTotal * 100,
-                    currency: 'ZAR',
-                    name: 'SiteCraft Digital',
-                    description: 'Web Development Services',
-                    customer: {
-                        email: clientEmail
-                    },
-                    callback: function (result) {
-                        if (result.error) {
-                            alert('Payment Failed: ' + result.error.message);
-                        } else {
-                            alert('Payment Successful!\nTransaction Ref: ' + result.id);
-                        }
-                    }
-                });
-            }
-
-            if (typeof window.YocoSDK !== 'undefined') {
-                initCheckout();
-            } else {
-                // Dynamic fallback injection
-                var script = document.createElement('script');
-                script.src = 'https://plugin.yoco.com/v1/yoco-sdk-web.js';
-                script.onload = initCheckout;
-                script.onerror = function() {
-                    alert('Unable to load payment gateway script. Please verify your connection or try another browser.');
-                };
-                document.head.appendChild(script);
-            }
+            const email = encodeURIComponent(document.getElementById('yoco-email').value);
+            
+            // Replaces external script execution with standard direct checkout link/redirect to Yoco portal
+            // Replace 'sitecraftdigital' below with your actual Yoco Pay Link handle if different
+            const yocoPayUrl = `https://pay.yoco.com/sitecraftdigital?amount=${grandTotal}&email=${email}`;
+            
+            window.location.href = yocoPayUrl;
         });
     </script>
 </body>
