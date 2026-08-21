@@ -356,12 +356,10 @@
             </div>
 
             <!-- Standard HTML Form Integration for Yoco Gateway -->
-            <form id="yoco-form" method="POST" action="https://pay.yoco.com/sitecraftdigital">
-                <input type="hidden" name="amount" id="yoco-amount" value="0">
-                <input type="hidden" name="currency" value="ZAR">
-                <input type="hidden" name="customerName" id="yoco-name" value="">
-                <input type="hidden" name="customerEmail" id="yoco-email" value="">
-                <button type="button" class="pay-btn" id="checkout-btn">Complete Payment via Yoco</button>
+     // Example code inside checkout.html when the user clicks 'Pay via Yoco'
+const totalAmount = 250.00; // Pass your dynamic total calculation here
+window.location.href = `pay.html?amount=${totalAmount}`;
+</form>
             </form>
         </div>
     </main>
@@ -421,7 +419,7 @@
         function updateTotal() {
             const grandTotal = basePrice + selectedAddonPrice;
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
-            document.getElementById('yoco-amount').value = grandTotal;
+            document.getElementById('yoco-amount').value = totalCalculatedAmount;
         }
 
         // Direct Payment Link / Fallback Redirect
