@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Updated Yoco CDN Script -->
-    <script src="https://static.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
+    <!-- Official Yoco Popup SDK Loader -->
+    <script src="https://plugin.yoco.com/v1/yoco-sdk-web.js"></script>
     <style>
         :root {
             --bg-color: #0b0a10;
@@ -376,6 +376,7 @@
 
         let basePrice = 0;
         let selectedAddonPrice = 0;
+        let clientEmail = '';
 
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -384,8 +385,10 @@
             const rawEmail = urlParams.get('email') || '';
             const projectType = urlParams.get('project-type') || 'landing-page';
 
+            clientEmail = decodeURIComponent(rawEmail);
+
             document.getElementById('display-name').textContent = decodeURIComponent(rawName);
-            document.getElementById('display-email').textContent = decodeURIComponent(rawEmail) || '-';
+            document.getElementById('display-email').textContent = clientEmail || '-';
 
             if (pricingMap[projectType]) {
                 document.getElementById('display-package').textContent = pricingMap[projectType].name;
@@ -412,38 +415,47 @@
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
         }
 
-        // Resilient Yoco Loader
-        function launchYocoPayment() {
-            const YocoClass = window.YocoSDK || window.Yoco;
-            
-            if (!YocoClass) {
-                alert('Unable to connect to Yoco payment gateway. If you are using an ad-blocker (like uBlock Origin or Brave Shield), please disable it for this page and try again.');
-                return;
-            }
-
-            const sdk = new YocoClass({
-                publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
-            });
-
+        // Direct Inline Popup Trigger
+        document.getElementById('checkout-btn').addEventListener('click', function () {
             const grandTotal = basePrice + selectedAddonPrice;
 
-            sdk.inline({
-                layout: 'field',
-                amountInCents: grandTotal * 100,
-                currency: 'ZAR',
-                name: 'SiteCraft Digital',
-                description: 'Web Development Deposit',
-                callback: function (result) {
-                    if (result.error) {
-                        alert('Payment Error: ' + result.error.message);
-                    } else {
-                        alert('Payment Successful!\nTransaction Token: ' + result.id);
-                    }
-                }
-            });
-        }
+            // Load dynamically if script hasn't rendered yet
+            function initCheckout() {
+                var yoco = new window.YocoSDK({
+                    publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
+                });
 
-        document.getElementById('checkout-btn').addEventListener('click', launchYocoPayment);
+                yoco.showPopup({
+                    amountInCents: grandTotal * 100,
+                    currency: 'ZAR',
+                    name: 'SiteCraft Digital',
+                    description: 'Web Development Services',
+                    customer: {
+                        email: clientEmail
+                    },
+                    callback: function (result) {
+                        if (result.error) {
+                            alert('Payment Failed: ' + result.error.message);
+                        } else {
+                            alert('Payment Successful!\nTransaction Ref: ' + result.id);
+                        }
+                    }
+                });
+            }
+
+            if (typeof window.YocoSDK !== 'undefined') {
+                initCheckout();
+            } else {
+                // Dynamic fallback injection
+                var script = document.createElement('script');
+                script.src = 'https://plugin.yoco.com/v1/yoco-sdk-web.js';
+                script.onload = initCheckout;
+                script.onerror = function() {
+                    alert('Unable to load payment gateway script. Please verify your connection or try another browser.');
+                };
+                document.head.appendChild(script);
+            }
+        });
     </script>
 </body>
 </html>
