@@ -278,6 +278,11 @@
             box-shadow: 0 10px 25px rgba(255, 94, 54, 0.4);
         }
 
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* Footer */
         footer {
             padding: 4rem 5%;
@@ -353,8 +358,11 @@
 
             <div class="order-form-card">
                 <h3 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 2rem;">Place Design Order</h3>
-                <!-- Replace YOUR_FORM_ID with your Formspree endpoint ID -->
-                <form action="https://formspree.io/f/xbgrbdej" method="POST">
+                
+                <form id="orderForm" action="https://formspree.io/f/xbgrbdej" method="POST">
+                    <!-- Backup hidden redirect field for paid Formspree accounts -->
+                    <input type="hidden" name="_next" value="checkout.html">
+
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
                         <input type="text" id="fullname" name="fullname" placeholder="e.g. Jane Doe" required>
@@ -400,7 +408,7 @@
                         <textarea id="details" name="details" rows="5" placeholder="Describe your brand, color preferences, necessary features, and launch target date..." required></textarea>
                     </div>
 
-                    <button type="submit" class="submit-btn">Submit Project Request</button>
+                    <button type="submit" id="submitBtn" class="submit-btn">Submit Project Request</button>
                 </form>
             </div>
         </section>
@@ -410,6 +418,44 @@
         <div>&copy; 2026 SiteCraft Digital. All Rights Reserved.</div>
         <div>Crafting Extraordinary Web Experiences.</div>
     </footer>
+
+    <script>
+        const form = document.getElementById('orderForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Disable button during submission
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Redirect immediately to checkout page upon success
+                    window.location.href = 'checkout.html';
+                } else {
+                    alert('There was a problem submitting your order. Please try again.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Project Request';
+                }
+            } catch (error) {
+                alert('Connection error. Please check your network and try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Project Request';
+            }
+        });
+    </script>
 
 </body>
 </html>
