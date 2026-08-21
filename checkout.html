@@ -8,9 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     
-    <!-- Updated Yoco Web SDK CDN -->
-    <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
-    
     <style>
         :root {
             --bg-color: #0b0a10;
@@ -279,6 +276,11 @@
             box-shadow: 0 10px 25px rgba(255, 94, 54, 0.4);
         }
 
+        .pay-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         footer {
             padding: 4rem 5%;
             border-top: 1px solid var(--glass-border);
@@ -368,119 +370,97 @@
         <div>Secured by Yoco Payment Gateway.</div>
     </footer>
 
-   <script>
-    const pricingMap = {
-        'landing-page': { name: 'Landing Page / Single Page', price: 500 },
-        'corporate': { name: 'Business / Corporate Website', price: 2500 },
-        'portfolio': { name: 'Personal Portfolio', price: 500 },
-        'custom': { name: 'Custom Web Application', price: 4000 }
-    };
+    <script>
+        const pricingMap = {
+            'landing-page': { name: 'Landing Page / Single Page', price: 500 },
+            'corporate': { name: 'Business / Corporate Website', price: 2500 },
+            'portfolio': { name: 'Personal Portfolio', price: 500 },
+            'custom': { name: 'Custom Web Application', price: 4000 }
+        };
 
-    // REPLACE THIS WITH YOUR CLOUDFLARE WORKER ROUTE
-    const CLOUDFLARE_WORKER_URL = 'https://yoco-payment-backend.sitecraftdigital0.workers.dev/';
+        // Render Service URL
+        const RENDER_BACKEND_URL = 'https://sitecraftdigital.onrender.com/create-checkout';
 
-    let basePrice = 0;
-    let selectedAddonPrice = 0;
+        let basePrice = 0;
+        let selectedAddonPrice = 0;
 
-    window.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        const clientName = urlParams.get('fullname') || 'Valued Client';
-        const clientEmail = urlParams.get('email') || '';
-        const projectType = urlParams.get('project-type') || 'landing-page';
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            const clientName = urlParams.get('fullname') || 'Valued Client';
+            const clientEmail = urlParams.get('email') || '';
+            const projectType = urlParams.get('project-type') || 'landing-page';
 
-        document.getElementById('display-name').textContent = clientName;
-        document.getElementById('display-email').textContent = clientEmail;
+            document.getElementById('display-name').textContent = clientName;
+            document.getElementById('display-email').textContent = clientEmail;
 
-        if (pricingMap[projectType]) {
-            document.getElementById('display-package').textContent = pricingMap[projectType].name;
-            basePrice = pricingMap[projectType].price;
-            document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
-        } else {
-            document.getElementById('display-package').textContent = 'Custom Web Project';
-            basePrice = 500;
-            document.getElementById('display-base-price').textContent = `R${basePrice}`;
+            if (pricingMap[projectType]) {
+                document.getElementById('display-package').textContent = pricingMap[projectType].name;
+                basePrice = pricingMap[projectType].price;
+                document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
+            } else {
+                document.getElementById('display-package').textContent = 'Custom Web Project';
+                basePrice = 500;
+                document.getElementById('display-base-price').textContent = `R${basePrice}`;
+            }
+
+            updateTotal();
+        });
+
+        function selectAddon(price, element) {
+            document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedAddonPrice = price;
+            updateTotal();
         }
 
-        updateTotal();
-    });
-
-    function selectAddon(price, element) {
-        document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
-        element.classList.add('selected');
-        selectedAddonPrice = price;
-        updateTotal();
-    }
-
-    function updateTotal() {
-        const grandTotal = basePrice + selectedAddonPrice;
-        document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
-    }
-
-    // Initialize Yoco Inline Popup SDK
-    let sdk;
-    try {
-        const YocoSDKClass = window.YocoSDK || window.Yoco;
-        if (YocoSDKClass) {
-            sdk = new YocoSDKClass({
-                publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
-            });
-        }
-    } catch (e) {
-        console.error("Yoco SDK initialization error:", e);
-    }
-
-    document.getElementById('checkout-btn').addEventListener('click', function () {
-        const grandTotal = basePrice + selectedAddonPrice;
-        const totalCents = grandTotal * 100;
-
-        if (grandTotal <= 0) {
-            alert('Invalid payment amount.');
-            return;
+        function updateTotal() {
+            const grandTotal = basePrice + selectedAddonPrice;
+            document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
         }
 
-        if (!sdk) {
-            alert('Yoco SDK could not be loaded. Please check network connectivity.');
-            return;
-        }
+        document.getElementById('checkout-btn').addEventListener('click', async function () {
+            const grandTotal = basePrice + selectedAddonPrice;
+            const totalCents = grandTotal * 100;
+            const btn = this;
 
-        // Step 1: Frontend gets a card token from Yoco SDK Popup
-        sdk.showPopup({
-            amountInCents: totalCents,
-            currency: 'ZAR',
-            name: 'SiteCraft Digital',
-            description: 'Web Development Payment',
-            callback: async function (result) {
-                if (result.error) {
-                    alert('Payment Error: ' + result.error.message);
+            if (grandTotal <= 0) {
+                alert('Invalid payment amount.');
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Redirecting to Yoco...';
+
+                // Send request to Render Backend to generate a checkout session
+                const response = await fetch(RENDER_BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amountInCents: totalCents,
+                        currency: 'ZAR',
+                        successUrl: window.location.origin + '/success.html',
+                        cancelUrl: window.location.origin + '/cancel.html'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.redirectUrl) {
+                    // Redirect customer to official Yoco payment page
+                    window.location.href = data.redirectUrl;
                 } else {
-                    // Step 2: Send token to Cloudflare Worker to finalize charge securely
-                    try {
-                        const response = await fetch(CLOUDFLARE_WORKER_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                token: result.id,
-                                amountInCents: totalCents,
-                                currency: 'ZAR'
-                            })
-                        });
-
-                        const chargeResult = await response.json();
-
-                        if (response.ok && chargeResult.status === 'successful') {
-                            alert('Payment Successful!\nTransaction ID: ' + chargeResult.id);
-                            window.location.href = 'index.html';
-                        } else {
-                            alert('Payment Failed: ' + (chargeResult.errorMessage || 'Charge execution failed.'));
-                        }
-                    } catch (err) {
-                        alert('Network Error during payment processing: ' + err.message);
-                    }
+                    alert('Failed to initiate checkout: ' + (data.message || data.error || 'Server error'));
+                    btn.disabled = false;
+                    btn.textContent = 'Complete Payment via Yoco';
                 }
+            } catch (err) {
+                alert('Connection error: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = 'Complete Payment via Yoco';
             }
         });
-    });
-</script>
+    </script>
 </body>
 </html>
