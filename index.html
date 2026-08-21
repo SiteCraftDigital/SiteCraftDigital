@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SiteCraft Digital | Digital Architecture & Web Artistry</title>
+    <title>SiteCraft Digital | Order Your Custom Web Design</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
@@ -130,11 +130,11 @@
 
         /* Hero Section */
         .hero {
-            min-height: 100vh;
+            min-height: 80vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 0 5%;
+            padding: 10rem 5% 4rem;
             position: relative;
         }
 
@@ -149,7 +149,7 @@
 
         .hero-title {
             font-family: var(--font-heading);
-            font-size: clamp(3rem, 8vw, 6.5rem);
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
             line-height: 1.05;
             max-width: 1100px;
             margin-bottom: 2rem;
@@ -164,134 +164,118 @@
         }
 
         .hero-description {
-            max-width: 550px;
+            max-width: 600px;
             color: var(--text-muted);
             font-size: 1.1rem;
             margin-bottom: 3rem;
         }
 
-        .cta-btn {
-            display: inline-block;
-            padding: 1.2rem 3rem;
+        /* Order Form Section */
+        .order-section {
+            padding: 2rem 5% 8rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .order-info h2 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .steps-list {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .step-num {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
             border: 1px solid var(--accent-cyan);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .order-form-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
             color: var(--text-main);
-            text-decoration: none;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent-orange);
+        }
+
+        .form-group select option {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-purple));
+            border: none;
+            color: #fff;
             font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
             border-radius: 50px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            width: fit-content;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 1rem;
         }
 
-        .cta-btn:hover {
-            background: var(--accent-cyan);
-            color: var(--bg-color);
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
-        }
-
-        /* Grid Section - Services */
-        .services {
-            padding: 8rem 5%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-        }
-
-        .art-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 3rem 2rem;
-            backdrop-filter: blur(10px);
-            position: relative;
-            transition: transform 0.4s, border-color 0.4s;
-        }
-
-        .art-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent-orange);
-        }
-
-        .card-num {
-            font-family: var(--font-heading);
-            font-size: 3rem;
-            color: rgba(255, 255, 255, 0.1);
-            position: absolute;
-            top: 1.5rem;
-            right: 2rem;
-        }
-
-        .card-title {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--text-main);
-        }
-
-        .card-desc {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
-
-        /* Showcase Section */
-        .showcase {
-            padding: 5rem 5% 10rem;
-        }
-
-        .section-header {
-            margin-bottom: 4rem;
-        }
-
-        .section-header h2 {
-            font-family: var(--font-heading);
-            font-size: 3rem;
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 2rem;
-        }
-
-        .gallery-item {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            height: 400px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: flex-end;
-            padding: 2rem;
-        }
-
-        .gallery-item:nth-child(1) { grid-column: span 7; }
-        .gallery-item:nth-child(2) { grid-column: span 5; }
-        .gallery-item:nth-child(3) { grid-column: span 12; height: 300px; }
-
-        .gallery-bg {
-            position: absolute;
-            inset: 0;
-            opacity: 0.2;
-            transition: opacity 0.4s, transform 0.4s;
-            z-index: 0;
-        }
-
-        .item-1 .gallery-bg { background: linear-gradient(45deg, var(--accent-orange), var(--accent-purple)); }
-        .item-2 .gallery-bg { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); }
-        .item-3 .gallery-bg { background: linear-gradient(90deg, var(--accent-purple), var(--accent-orange)); }
-
-        .gallery-item:hover .gallery-bg {
-            opacity: 0.4;
-            transform: scale(1.05);
-        }
-
-        .gallery-content {
-            position: relative;
-            z-index: 1;
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 94, 54, 0.4);
         }
 
         /* Footer */
@@ -306,8 +290,9 @@
         }
 
         @media (max-width: 900px) {
-            .gallery-item:nth-child(1),
-            .gallery-item:nth-child(2) { grid-column: span 12; }
+            .order-section {
+                grid-template-columns: 1fr;
+            }
             nav { display: none; }
         }
     </style>
@@ -323,71 +308,92 @@
     <header>
         <div class="logo">SiteCraft</div>
         <nav>
-            <a href="#services">Craft</a>
-            <a href="#showcase">Works</a>
-            <a href="#contact">Initiate</a>
+            <a href="#process">How It Works</a>
+            <a href="#order">Order Now</a>
         </nav>
     </header>
 
     <main>
         <section class="hero">
-            <div class="hero-tag">Digital Architecture & Design</div>
-            <h1 class="hero-title">We craft digital <span>masterpieces</span> for brands that defy average.</h1>
-            <p class="hero-description">Transforming abstract concepts into immersive, high-converting digital environments. Built with precision, sculpted with passion.</p>
-            <a href="#contact" class="cta-btn">Start A Project</a>
+            <div class="hero-tag">Bespoke Web Development</div>
+            <h1 class="hero-title">Order your custom <span>digital canvas</span> built by experts.</h1>
+            <p class="hero-description">Tell us your vision and submit your site requirements below. We transform your concept into a custom, high-converting digital masterpiece.</p>
         </section>
 
-        <section id="services" class="services">
-            <div class="art-card">
-                <div class="card-num">01</div>
-                <h3 class="card-title">Custom Web Design</h3>
-                <p class="card-desc">Bespoke visual identities translated into responsive, fluid web interfaces tailored specifically to your brand DNA.</p>
+        <section id="order" class="order-section">
+            <div class="order-info" id="process">
+                <h2>Commission Your Website</h2>
+                <p style="color: var(--text-muted);">Skip the generic visual builders. Place your request, select your desired specifications, and let us construct a tailored solution engineered specifically for your business.</p>
+                
+                <ul class="steps-list">
+                    <li class="step-item">
+                        <div class="step-num">01</div>
+                        <div>
+                            <h4 style="font-size: 1.1rem;">Submit Your Brief</h4>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Fill out the project design form with your business details, target goals, and style preferences.</p>
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-num">02</div>
+                        <div>
+                            <h4 style="font-size: 1.1rem;">Review & Quotation</h4>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">We review your project specs within 24 hours and send a formal pitch and custom quote to your email.</p>
+                        </div>
+                    </li>
+                    <li class="step-item">
+                        <div class="step-num">03</div>
+                        <div>
+                            <h4 style="font-size: 1.1rem;">Design & Build</h4>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Once approved, our design team builds, tests, and launches your bespoke site directly to your domain.</p>
+                        </div>
+                    </li>
+                </ul>
             </div>
-            <div class="art-card">
-                <div class="card-num">02</div>
-                <h3 class="card-title">Interactive Development</h3>
-                <p class="card-desc">Clean, optimized code driving rich animations, seamless transitions, and flawless multi-device performance.</p>
-            </div>
-            <div class="art-card">
-                <div class="card-num">03</div>
-                <h3 class="card-title">Digital Art Direction</h3>
-                <p class="card-desc">Comprehensive visual strategy encompassing interactive elements, typography, and cohesive digital aesthetics.</p>
-            </div>
-        </section>
 
-        <section id="showcase" class="showcase">
-            <div class="section-header">
-                <h2>Selected Canvas</h2>
-            </div>
-            <div class="gallery-grid">
-                <div class="gallery-item item-1">
-                    <div class="gallery-bg"></div>
-                    <div class="gallery-content">
-                        <h3>Aura Studio</h3>
-                        <p>E-Commerce Experience</p>
+            <div class="order-form-card">
+                <h3 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 2rem;">Place Design Order</h3>
+                <form action="#" method="POST">
+                    <div class="form-group">
+                        <label for="fullname">Full Name</label>
+                        <input type="text" id="fullname" name="fullname" placeholder="e.g. Jane Doe" required>
                     </div>
-                </div>
-                <div class="gallery-item item-2">
-                    <div class="gallery-bg"></div>
-                    <div class="gallery-content">
-                        <h3>Vortex Media</h3>
-                        <p>Interactive Portfolio</p>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="jane@example.com" required>
                     </div>
-                </div>
-                <div class="gallery-item item-3">
-                    <div class="gallery-bg"></div>
-                    <div class="gallery-content">
-                        <h3>Luminary Capital</h3>
-                        <p>Corporate Web Platform</p>
+
+                    <div class="form-group">
+                        <label for="company">Company / Business Name</label>
+                        <input type="text" id="company" name="company" placeholder="e.g. SiteCraft Studio">
                     </div>
-                </div>
+
+                    <div class="form-group">
+                        <label for="project-type">Website Type</label>
+                        <select id="project-type" name="project-type" required>
+                            <option value="" disabled selected>Select a package type...</option>
+                            <option value="landing-page">Landing Page / Single Page</option>
+                            <option value="corporate">Business / Corporate Website</option>
+                            <option value="e-commerce">E-Commerce / Store</option>
+                            <option value="portfolio">Personal Portfolio</option>
+                            <option value="custom">Custom Web Application</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="details">Project Details & Requirements</label>
+                        <textarea id="details" name="details" rows="5" placeholder="Describe your brand, color preferences, necessary features, and launch target date..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Submit Project Request</button>
+                </form>
             </div>
         </section>
     </main>
 
-    <footer id="contact">
+    <footer>
         <div>&copy; 2026 SiteCraft Digital. All Rights Reserved.</div>
-        <div>Designed for the Extraordinary.</div>
+        <div>Crafting Extraordinary Web Experiences.</div>
     </footer>
 
 </body>
