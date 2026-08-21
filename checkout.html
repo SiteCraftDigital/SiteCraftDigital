@@ -368,100 +368,119 @@
         <div>Secured by Yoco Payment Gateway.</div>
     </footer>
 
-    <script>
-        const pricingMap = {
-            'landing-page': { name: 'Landing Page / Single Page', price: 500 },
-            'corporate': { name: 'Business / Corporate Website', price: 2500 },
-            'portfolio': { name: 'Personal Portfolio', price: 500 },
-            'custom': { name: 'Custom Web Application', price: 4000 }
-        };
+   <script>
+    const pricingMap = {
+        'landing-page': { name: 'Landing Page / Single Page', price: 500 },
+        'corporate': { name: 'Business / Corporate Website', price: 2500 },
+        'portfolio': { name: 'Personal Portfolio', price: 500 },
+        'custom': { name: 'Custom Web Application', price: 4000 }
+    };
 
-        let basePrice = 0;
-        let selectedAddonPrice = 0;
+    // REPLACE THIS WITH YOUR CLOUDFLARE WORKER ROUTE
+    const CLOUDFLARE_WORKER_URL = 'https://your-cloudflare-worker.your-subdomain.workers.dev';
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            const clientName = urlParams.get('fullname') || 'Valued Client';
-            const clientEmail = urlParams.get('email') || '';
-            const projectType = urlParams.get('project-type') || 'landing-page';
+    let basePrice = 0;
+    let selectedAddonPrice = 0;
 
-            document.getElementById('display-name').textContent = clientName;
-            document.getElementById('display-email').textContent = clientEmail;
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const clientName = urlParams.get('fullname') || 'Valued Client';
+        const clientEmail = urlParams.get('email') || '';
+        const projectType = urlParams.get('project-type') || 'landing-page';
 
-            if (pricingMap[projectType]) {
-                document.getElementById('display-package').textContent = pricingMap[projectType].name;
-                basePrice = pricingMap[projectType].price;
-                document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
-            } else {
-                document.getElementById('display-package').textContent = 'Custom Web Project';
-                basePrice = 500;
-                document.getElementById('display-base-price').textContent = `R${basePrice}`;
-            }
+        document.getElementById('display-name').textContent = clientName;
+        document.getElementById('display-email').textContent = clientEmail;
 
-            updateTotal();
-        });
-
-        function selectAddon(price, element) {
-            document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedAddonPrice = price;
-            updateTotal();
+        if (pricingMap[projectType]) {
+            document.getElementById('display-package').textContent = pricingMap[projectType].name;
+            basePrice = pricingMap[projectType].price;
+            document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
+        } else {
+            document.getElementById('display-package').textContent = 'Custom Web Project';
+            basePrice = 500;
+            document.getElementById('display-base-price').textContent = `R${basePrice}`;
         }
 
-        function updateTotal() {
-            const grandTotal = basePrice + selectedAddonPrice;
-            document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
+        updateTotal();
+    });
+
+    function selectAddon(price, element) {
+        document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedAddonPrice = price;
+        updateTotal();
+    }
+
+    function updateTotal() {
+        const grandTotal = basePrice + selectedAddonPrice;
+        document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
+    }
+
+    // Initialize Yoco Inline Popup SDK
+    let sdk;
+    try {
+        const YocoSDKClass = window.YocoSDK || window.Yoco;
+        if (YocoSDKClass) {
+            sdk = new YocoSDKClass({
+                publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
+            });
+        }
+    } catch (e) {
+        console.error("Yoco SDK initialization error:", e);
+    }
+
+    document.getElementById('checkout-btn').addEventListener('click', function () {
+        const grandTotal = basePrice + selectedAddonPrice;
+        const totalCents = grandTotal * 100;
+
+        if (grandTotal <= 0) {
+            alert('Invalid payment amount.');
+            return;
         }
 
-        // Initialize Yoco SDK using window.Yoco
-        let sdk;
-        try {
-            const YocoSDKClass = window.YocoSDK || window.Yoco;
-            if (YocoSDKClass) {
-                sdk = new YocoSDKClass({
-                    publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
-                });
-            }
-        } catch (e) {
-            console.error("Yoco SDK initialization error:", e);
+        if (!sdk) {
+            alert('Yoco SDK could not be loaded. Please check network connectivity.');
+            return;
         }
 
-        document.getElementById('checkout-btn').addEventListener('click', function () {
-            const grandTotal = basePrice + selectedAddonPrice;
-
-            if (grandTotal <= 0) {
-                alert('Invalid payment amount.');
-                return;
-            }
-
-            if (!sdk) {
-                const YocoSDKClass = window.YocoSDK || window.Yoco;
-                if (YocoSDKClass) {
-                    sdk = new YocoSDKClass({
-                        publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
-                    });
+        // Step 1: Frontend gets a card token from Yoco SDK Popup
+        sdk.showPopup({
+            amountInCents: totalCents,
+            currency: 'ZAR',
+            name: 'SiteCraft Digital',
+            description: 'Web Development Payment',
+            callback: async function (result) {
+                if (result.error) {
+                    alert('Payment Error: ' + result.error.message);
                 } else {
-                    alert('Yoco SDK could not be loaded. Please verify network connectivity.');
-                    return;
-                }
-            }
+                    // Step 2: Send token to Cloudflare Worker to finalize charge securely
+                    try {
+                        const response = await fetch(CLOUDFLARE_WORKER_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                token: result.id,
+                                amountInCents: totalCents,
+                                currency: 'ZAR'
+                            })
+                        });
 
-            sdk.showPopup({
-                amountInCents: grandTotal * 100,
-                currency: 'ZAR',
-                name: 'SiteCraft Digital',
-                description: 'Web Development Payment',
-                callback: function (result) {
-                    if (result.error) {
-                        alert('Payment Error: ' + result.error.message);
-                    } else {
-                        alert('Payment Successful!\nTransaction Reference: ' + result.id);
-                        window.location.href = 'index.html';
+                        const chargeResult = await response.json();
+
+                        if (response.ok && chargeResult.status === 'successful') {
+                            alert('Payment Successful!\nTransaction ID: ' + chargeResult.id);
+                            window.location.href = 'index.html';
+                        } else {
+                            alert('Payment Failed: ' + (chargeResult.errorMessage || 'Charge execution failed.'));
+                        }
+                    } catch (err) {
+                        alert('Network Error during payment processing: ' + err.message);
                     }
                 }
-            });
+            }
         });
-    </script>
+    });
+</script>
 </body>
 </html>
