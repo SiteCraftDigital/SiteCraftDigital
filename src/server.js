@@ -4,9 +4,9 @@ const fetch = require('node-fetch');
 
 const app = express();
 app.use(express.json());
-app.use(cors()); // Allows your GitHub Pages domain to talk to this backend
+app.use(cors()); // Allows your GitHub Pages domain to talk to this backend[cite: 6]
 
-const YOCO_SECRET_KEY = process.env.YOCO_SECRET_KEY; // Stored securely in Render dashboard
+const YOCO_SECRET_KEY = process.env.YOCO_SECRET_KEY; // Stored securely in Render dashboard[cite: 6]
 
 // 1. Create Checkout Session Endpoint
 app.post('/create-checkout', async (req, res) => {
@@ -15,6 +15,11 @@ app.post('/create-checkout', async (req, res) => {
   if (!amountInCents || amountInCents <= 0) {
     return res.status(400).json({ error: 'Invalid payment amount.' });
   }
+
+  // Force Yoco to attach the transaction ID to the redirect URL
+  const finalSuccessUrl = successUrl.includes('?') 
+    ? `${successUrl}&checkoutId={checkoutId}` 
+    : `${successUrl}?checkoutId={checkoutId}`;
 
   try {
     const response = await fetch('https://payments.yoco.com/api/checkouts', {
@@ -26,7 +31,7 @@ app.post('/create-checkout', async (req, res) => {
       body: JSON.stringify({
         amount: amountInCents,
         currency: currency,
-        successUrl: successUrl,
+        successUrl: finalSuccessUrl,
         cancelUrl: cancelUrl
       })
     });
@@ -45,7 +50,7 @@ app.post('/create-checkout', async (req, res) => {
   }
 });
 
-// 2. Verify Payment Endpoint (Fixes false approval bug)
+// 2. Verify Payment Endpoint
 app.post('/verify-payment', async (req, res) => {
   const { checkoutId } = req.body;
 
@@ -63,7 +68,7 @@ app.post('/verify-payment', async (req, res) => {
 
     const data = await response.json();
 
-    // Only return success if status is explicitly successful/paid
+    // Strict status verification
     if (response.ok && (data.status === 'successful' || data.status === 'paid')) {
       return res.json({ success: true, status: data.status });
     } else {
