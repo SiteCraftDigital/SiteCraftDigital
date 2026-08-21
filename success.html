@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SiteCraft Digital | Payment Successful</title>
+    <title>SiteCraft Digital | Payment Status</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
@@ -55,6 +55,7 @@
             font-size: 3.5rem;
             color: #00e676;
             margin-bottom: 1rem;
+            transition: color 0.3s ease;
         }
 
         .title {
@@ -70,6 +71,13 @@
             color: var(--text-muted);
             margin-bottom: 2rem;
             font-size: 0.95rem;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .home-btn {
@@ -89,14 +97,84 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(255, 94, 54, 0.4);
         }
+
+        .retry-btn {
+            display: none;
+            padding: 1rem 2.5rem;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 50px;
+            transition: border-color 0.3s;
+        }
+
+        .retry-btn:hover {
+            border-color: var(--accent-cyan);
+        }
     </style>
 </head>
 <body>
     <div class="status-card">
-        <div class="icon">&#10003;</div>
-        <h1 class="title">Payment Successful</h1>
-        <p class="message">Thank you for your order! Your payment has been processed successfully via Yoco. Our team will review your project details and get in touch via email shortly.</p>
-        <a href="index.html" class="home-btn">Return to Homepage</a>
+        <div class="icon" id="status-icon">&#8987;</div>
+        <h1 class="title" id="status-title">Verifying Payment...</h1>
+        <p class="message" id="status-message">Please wait while we confirm your transaction status with Yoco.</p>
+        <div class="action-btns">
+            <a href="checkout.html" class="retry-btn" id="retry-btn">Try Again</a>
+            <a href="index.html" class="home-btn" id="home-btn">Return Home</a>
+        </div>
     </div>
+
+    <script>
+        const RENDER_BACKEND_URL = 'https://sitecraftdigital.onrender.com/verify-payment';
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const checkoutId = urlParams.get('checkoutId') || urlParams.get('id');
+
+            if (!checkoutId) {
+                // Fallback display if user lands on page without reference
+                showSuccess();
+                return;
+            }
+
+            try {
+                const response = await fetch(RENDER_BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ checkoutId })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showSuccess();
+                } else {
+                    showFailure(data.message || 'Payment was declined or unverified.');
+                }
+            } catch (err) {
+                showFailure('Connection error: Unable to verify payment status.');
+            }
+        });
+
+        function showSuccess() {
+            document.getElementById('status-icon').innerHTML = '&#10003;';
+            document.getElementById('status-icon').style.color = '#00e676';
+            document.getElementById('status-title').textContent = 'Payment Successful';
+            document.getElementById('status-message').textContent = 'Thank you for your order! Your payment has been processed successfully via Yoco. Our team will review your project details and get in touch via email shortly.';
+            document.getElementById('retry-btn').style.display = 'none';
+        }
+
+        function showFailure(message) {
+            document.getElementById('status-icon').innerHTML = '&#10007;';
+            document.getElementById('status-icon').style.color = '#ff1744';
+            document.getElementById('status-title').textContent = 'Payment Failed';
+            document.getElementById('status-message').textContent = message;
+            document.getElementById('retry-btn').style.display = 'inline-block';
+        }
+    </script>
 </body>
 </html>
