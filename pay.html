@@ -58,22 +58,16 @@
 </div>
 
 <script>
-    // Extract total amount from URL parameters (e.g., pay.html?amount=250.00)
     const urlParams = new URLSearchParams(window.location.search);
     const amountParam = parseFloat(urlParams.get('amount')) || 0;
-
-    // Convert amount to Cents (Yoco SDK requires amounts in cents)
     const amountInCents = Math.round(amountParam * 100);
 
-    // Display formatted amount
     document.getElementById('display-amount').innerText = 'R' + amountParam.toFixed(2);
 
-    // Initialize Yoco SDK (Replace with your actual public key)
     const sdk = new window.YocoSDK({
-        publicKey: 'pk_test_ed3bd521ee09260ff0d' // Replace with your Yoco Public Key
+        publicKey: 'pk_test_ed3bd521ee09260ff0d'
     });
 
-    // Handle Pay Button Click
     document.getElementById('pay-button').addEventListener('click', function () {
         if (amountInCents <= 0) {
             alert('Invalid payment amount.');
@@ -90,7 +84,6 @@
                     alert('Payment failed: ' + result.error.message);
                 } else {
                     alert('Payment successful! Reference: ' + result.id);
-                    // Redirect to success page or clear cart
                     window.location.href = 'index.html';
                 }
             }
