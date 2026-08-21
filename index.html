@@ -353,7 +353,8 @@
 
             <div class="order-form-card">
                 <h3 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 2rem;">Place Design Order</h3>
-               <form action="checkout.html" method="GET">
+                <!-- Replace YOUR_FORM_ID with your Formspree endpoint ID -->
+                <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
                     <div class="form-group">
                         <label for="fullname">Full Name</label>
                         <input type="text" id="fullname" name="fullname" placeholder="e.g. Jane Doe" required>
@@ -362,6 +363,19 @@
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" name="email" placeholder="jane@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            name="phone" 
+                            placeholder="0123456789" 
+                            pattern="0[0-9]{9}" 
+                            maxlength="10" 
+                            title="Phone number must start with 0 and contain exactly 10 digits" 
+                            required>
                     </div>
 
                     <div class="form-group">
