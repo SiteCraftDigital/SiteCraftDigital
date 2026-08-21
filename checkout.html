@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Yoco SDK -->
+    <!-- Yoco Web SDK -->
     <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
     <style>
         :root {
@@ -377,7 +377,6 @@
     </footer>
 
     <script>
-        // Pricing Table Definition
         const pricingMap = {
             'landing-page': { name: 'Landing Page / Single Page', price: 500 },
             'corporate': { name: 'Business / Corporate Website', price: 2500 },
@@ -388,7 +387,6 @@
         let basePrice = 0;
         let selectedAddonPrice = 0;
 
-        // Load URL Parameters passed from index.html
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             
@@ -412,7 +410,6 @@
             updateTotal();
         });
 
-        // Toggle maintenance option selection
         function selectAddon(price, element) {
             document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
@@ -420,35 +417,41 @@
             updateTotal();
         }
 
-        // Calculate and render final total
         function updateTotal() {
             const grandTotal = basePrice + selectedAddonPrice;
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
         }
 
-        // Initialize Yoco SDK with Public Key
-        const yoco = new YocoSDK({
-            publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
-        });
+        // Initialize Yoco SDK Instance safely
+        let yoco;
+        try {
+            yoco = new YocoSDK({
+                publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
+            });
+        } catch (e) {
+            console.error("Yoco SDK loading error:", e);
+        }
 
-        // Trigger Yoco Payment Overlay on click
         document.getElementById('checkout-btn').addEventListener('click', function () {
-            const grandTotal = basePrice + selectedAddonPrice;
-            const clientEmail = document.getElementById('display-email').textContent;
+            if (typeof YocoSDK === 'undefined' || !yoco) {
+                alert('Yoco SDK is still loading or blocked. Please check your internet connection or ad-blocker.');
+                return;
+            }
 
-            yoco.showPopup({
-                amountInCents: grandTotal * 100, // Converts ZAR into Cents required by Yoco API
+            const grandTotal = basePrice + selectedAddonPrice;
+
+            // Trigger Yoco Inline Payment Popup Modal
+            yoco.inline({
+                layout: 'field',
+                amountInCents: grandTotal * 100,
                 currency: 'ZAR',
                 name: 'SiteCraft Digital',
                 description: 'Web Development Deposit',
-                customer: {
-                    email: clientEmail !== '-' ? clientEmail : ''
-                },
                 callback: function (result) {
                     if (result.error) {
-                        alert('Payment Failed: ' + result.error.message);
+                        alert('Payment Error: ' + result.error.message);
                     } else {
-                        alert('Payment Successful!\nTransaction Token: ' + result.id);
+                        alert('Payment Successful!\nCard Token: ' + result.id);
                     }
                 }
             });
