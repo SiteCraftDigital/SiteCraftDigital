@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteCraft Digital | Digital Architecture & Web Artistry</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0a10;
+            --accent-orange: #ff5e36;
+            --accent-purple: #8a2be2;
+            --accent-cyan: #00f2fe;
+            --text-main: #f3f3f8;
+            --text-muted: #a09caf;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-heading: 'Cinzel', serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Abstract Animated Canvas Elements */
+        .bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.4;
+            animation: float 18s infinite alternate ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-orange);
+            top: -100px;
+            left: -100px;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: var(--accent-purple);
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-cyan);
+            top: 40%;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(80px, 60px) scale(1.1) rotate(180deg); }
+            100% { transform: translate(-50px, 100px) scale(0.9) rotate(360deg); }
+        }
+
+        /* Header & Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #fff, var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            margin-left: 2.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 5%;
+            position: relative;
+        }
+
+        .hero-tag {
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .hero-title {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 8vw, 6.5rem);
+            line-height: 1.05;
+            max-width: 1100px;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-style: italic;
+        }
+
+        .hero-description {
+            max-width: 550px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            border: 1px solid var(--accent-cyan);
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            width: fit-content;
+        }
+
+        .cta-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-color);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+        }
+
+        /* Grid Section - Services */
+        .services {
+            padding: 8rem 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .art-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            transition: transform 0.4s, border-color 0.4s;
+        }
+
+        .art-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-orange);
+        }
+
+        .card-num {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.1);
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Showcase Section */
+        .showcase {
+            padding: 5rem 5% 10rem;
+        }
+
+        .section-header {
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-family: var(--font-heading);
+            font-size: 3rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+        }
+
+        .gallery-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+        }
+
+        .gallery-item:nth-child(1) { grid-column: span 7; }
+        .gallery-item:nth-child(2) { grid-column: span 5; }
+        .gallery-item:nth-child(3) { grid-column: span 12; height: 300px; }
+
+        .gallery-bg {
+            position: absolute;
+            inset: 0;
+            opacity: 0.2;
+            transition: opacity 0.4s, transform 0.4s;
+            z-index: 0;
+        }
+
+        .item-1 .gallery-bg { background: linear-gradient(45deg, var(--accent-orange), var(--accent-purple)); }
+        .item-2 .gallery-bg { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); }
+        .item-3 .gallery-bg { background: linear-gradient(90deg, var(--accent-purple), var(--accent-orange)); }
+
+        .gallery-item:hover .gallery-bg {
+            opacity: 0.4;
+            transform: scale(1.05);
+        }
+
+        .gallery-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 5%;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .gallery-item:nth-child(1),
+            .gallery-item:nth-child(2) { grid-column: span 12; }
+            nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-canvas">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <header>
+        <div class="logo">SiteCraft</div>
+        <nav>
+            <a href="#services">Craft</a>
+            <a href="#showcase">Works</a>
+            <a href="#contact">Initiate</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-tag">Digital Architecture & Design</div>
+            <h1 class="hero-title">We craft digital <span>masterpieces</span> for brands that defy average.</h1>
+            <p class="hero-description">Transforming abstract concepts into immersive, high-converting digital environments. Built with precision, sculpted with passion.</p>
+            <a href="#contact" class="cta-btn">Start A Project</a>
+        </section>
+
+        <section id="services" class="services">
+            <div class="art-card">
+                <div class="card-num">01</div>
+                <h3 class="card-title">Custom Web Design</h3>
+                <p class="card-desc">Bespoke visual identities translated into responsive, fluid web interfaces tailored specifically to your brand DNA.</p>
+            </div>
+            <div class="art-card">
+                <div class="card-num">02</div>
+                <h3 class="card-title">Interactive Development</h3>
+                <p class="card-desc">Clean, optimized code driving rich animations, seamless transitions, and flawless multi-device performance.</p>
+            </div>
+            <div class="art-card">
+                <div class="card-num">03</div>
+                <h3 class="card-title">Digital Art Direction</h3>
+                <p class="card-desc">Comprehensive visual strategy encompassing interactive elements, typography, and cohesive digital aesthetics.</p>
+            </div>
+        </section>
+
+        <section id="showcase" class="showcase">
+            <div class="section-header">
+                <h2>Selected Canvas</h2>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-item item-1">
+                    <div class="gallery-bg"></div>
+                    <div class="gallery-content">
+                        <h3>Aura Studio</h3>
+                        <p>E-Commerce Experience</p>
+                    </div>
+                </div>
+                <div class="gallery-item item-2">
+                    <div class="gallery-bg"></div>
+                    <div class="gallery-content">
+                        <h3>Vortex Media</h3>
+                        <p>Interactive Portfolio</p>
+                    </div>
+                </div>
+                <div class="gallery-item item-3">
+                    <div class="gallery-bg"></div>
+                    <div class="gallery-content">
+                        <h3>Luminary Capital</h3>
+                        <p>Corporate Web Platform</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <div>&copy; 2026 SiteCraft Digital. All Rights Reserved.</div>
+        <div>Designed for the Extraordinary.</div>
+    </footer>
+
+</body>
+</html>
