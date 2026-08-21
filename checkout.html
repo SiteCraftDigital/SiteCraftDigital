@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Yoco SDK loaded over HTTPS -->
-    <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
+    <!-- Updated Yoco CDN Script -->
+    <script src="https://static.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
     <style>
         :root {
             --bg-color: #0b0a10;
@@ -277,11 +277,6 @@
             box-shadow: 0 10px 25px rgba(255, 94, 54, 0.4);
         }
 
-        /* Container for Inline Yoco Form if Modal isn't popup */
-        #yoco-container {
-            margin-top: 1.5rem;
-        }
-
         footer {
             padding: 4rem 5%;
             border-top: 1px solid var(--glass-border);
@@ -362,7 +357,6 @@
                 <span class="total-amount" id="display-total">R0</span>
             </div>
 
-            <div id="yoco-container"></div>
             <button class="pay-btn" id="checkout-btn">Complete Payment via Yoco</button>
         </div>
     </main>
@@ -383,7 +377,6 @@
         let basePrice = 0;
         let selectedAddonPrice = 0;
 
-        // Decode URL parameters cleanly
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             
@@ -391,12 +384,8 @@
             const rawEmail = urlParams.get('email') || '';
             const projectType = urlParams.get('project-type') || 'landing-page';
 
-            // Clean decode %40 double encoding issues
-            const clientName = decodeURIComponent(rawName);
-            const clientEmail = decodeURIComponent(rawEmail);
-
-            document.getElementById('display-name').textContent = clientName;
-            document.getElementById('display-email').textContent = clientEmail || '-';
+            document.getElementById('display-name').textContent = decodeURIComponent(rawName);
+            document.getElementById('display-email').textContent = decodeURIComponent(rawEmail) || '-';
 
             if (pricingMap[projectType]) {
                 document.getElementById('display-package').textContent = pricingMap[projectType].name;
@@ -423,14 +412,16 @@
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
         }
 
-        // Initialize Yoco with fallback check
-        document.getElementById('checkout-btn').addEventListener('click', function () {
-            if (typeof YocoSDK === 'undefined') {
-                alert('Yoco SDK could not be reached. Please disable content/ad-blockers or try refreshing the page.');
+        // Resilient Yoco Loader
+        function launchYocoPayment() {
+            const YocoClass = window.YocoSDK || window.Yoco;
+            
+            if (!YocoClass) {
+                alert('Unable to connect to Yoco payment gateway. If you are using an ad-blocker (like uBlock Origin or Brave Shield), please disable it for this page and try again.');
                 return;
             }
 
-            const sdk = new YocoSDK({
+            const sdk = new YocoClass({
                 publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
             });
 
@@ -450,7 +441,9 @@
                     }
                 }
             });
-        });
+        }
+
+        document.getElementById('checkout-btn').addEventListener('click', launchYocoPayment);
     </script>
 </body>
 </html>
