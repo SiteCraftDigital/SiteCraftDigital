@@ -7,8 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Yoco Web SDK -->
+    
+    <!-- Updated Yoco Web SDK CDN -->
     <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
+    
     <style>
         :root {
             --bg-color: #0b0a10;
@@ -412,21 +414,20 @@
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
         }
 
-        let yoco;
+        // Initialize Yoco SDK using window.Yoco
+        let sdk;
         try {
-            yoco = new window.YocoSDK({
-                publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
-            });
+            const YocoSDKClass = window.YocoSDK || window.Yoco;
+            if (YocoSDKClass) {
+                sdk = new YocoSDKClass({
+                    publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
+                });
+            }
         } catch (e) {
-            console.error("Yoco SDK loading error:", e);
+            console.error("Yoco SDK initialization error:", e);
         }
 
         document.getElementById('checkout-btn').addEventListener('click', function () {
-            if (typeof YocoSDK === 'undefined' || !yoco) {
-                alert('Yoco SDK is still loading or blocked. Please check your internet connection.');
-                return;
-            }
-
             const grandTotal = basePrice + selectedAddonPrice;
 
             if (grandTotal <= 0) {
@@ -434,8 +435,19 @@
                 return;
             }
 
-            // Fixed popup launcher using Yoco SDK showPopup
-            yoco.showPopup({
+            if (!sdk) {
+                const YocoSDKClass = window.YocoSDK || window.Yoco;
+                if (YocoSDKClass) {
+                    sdk = new YocoSDKClass({
+                        publicKey: 'pk_test_549b6dd4mWKPGLj47ef4'
+                    });
+                } else {
+                    alert('Yoco SDK could not be loaded. Please verify network connectivity.');
+                    return;
+                }
+            }
+
+            sdk.showPopup({
                 amountInCents: grandTotal * 100,
                 currency: 'ZAR',
                 name: 'SiteCraft Digital',
