@@ -128,53 +128,62 @@
         </div>
     </div>
 
-    <script>
-        const RENDER_BACKEND_URL = 'https://sitecraftdigital.onrender.com/verify-payment';
+   <script>
+    const RENDER_BACKEND_URL = 'https://sitecraftdigital.onrender.com/verify-payment';
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const checkoutId = urlParams.get('checkoutId') || urlParams.get('id');
+    window.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const checkoutId = urlParams.get('checkoutId') || urlParams.get('id') || urlParams.get('checkout_id');
+        const urlStatus = urlParams.get('status');
 
-            if (!checkoutId) {
-                // Fallback display if user lands on page without reference
+        // 1. Direct URL status check from Yoco query parameters
+        if (urlStatus && (urlStatus.toLowerCase() === 'failed' || urlStatus.toLowerCase() === 'declined' || urlStatus.toLowerCase() === 'cancelled')) {
+            showFailure('Payment was declined or cancelled by the bank.');
+            return;
+        }
+
+        // 2. If no ID is present, do not assume success
+        if (!checkoutId) {
+            showFailure('No transaction reference found. Unable to confirm payment.');
+            return;
+        }
+
+        // 3. Verify status with Render backend
+        try {
+            const response = await fetch(RENDER_BACKEND_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ checkoutId })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
                 showSuccess();
-                return;
+            } else {
+                showFailure(data.message || 'Payment verification failed or transaction was declined.');
             }
-
-            try {
-                const response = await fetch(RENDER_BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ checkoutId })
-                });
-
-                const data = await response.json();
-
-                if (response.ok && data.success) {
-                    showSuccess();
-                } else {
-                    showFailure(data.message || 'Payment was declined or unverified.');
-                }
-            } catch (err) {
-                showFailure('Connection error: Unable to verify payment status.');
-            }
-        });
-
-        function showSuccess() {
-            document.getElementById('status-icon').innerHTML = '&#10003;';
-            document.getElementById('status-icon').style.color = '#00e676';
-            document.getElementById('status-title').textContent = 'Payment Successful';
-            document.getElementById('status-message').textContent = 'Thank you for your order! Your payment has been processed successfully via Yoco. Our team will review your project details and get in touch via email shortly.';
-            document.getElementById('retry-btn').style.display = 'none';
+        } catch (err) {
+            showFailure('Connection error: Unable to verify payment status with server.');
         }
+    });
 
-        function showFailure(message) {
-            document.getElementById('status-icon').innerHTML = '&#10007;';
-            document.getElementById('status-icon').style.color = '#ff1744';
-            document.getElementById('status-title').textContent = 'Payment Failed';
-            document.getElementById('status-message').textContent = message;
-            document.getElementById('retry-btn').style.display = 'inline-block';
-        }
-    </script>
+    function showSuccess() {
+        document.getElementById('status-icon').innerHTML = '&#10003;';
+        document.getElementById('status-icon').style.color = '#00e676';
+        document.getElementById('status-title').textContent = 'Payment Successful';
+        document.getElementById('status-message').textContent = 'Thank you for your order! Your payment has been processed successfully via Yoco. Our team will review your project details and get in touch via email shortly.';
+        document.getElementById('retry-btn').style.display = 'none';
+    }
+
+    function showFailure(message) {
+        document.getElementById('status-icon').innerHTML = '&#10007;';
+        document.getElementById('status-icon').style.color = '#ff1744';
+        document.getElementById('status-title').textContent = 'Payment Failed';
+        document.getElementById('status-message').textContent = message;
+        document.getElementById('retry-btn').style.display = 'inline-block';
+    }
+</script>
 </body>
 </html>
