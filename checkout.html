@@ -92,7 +92,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2rem 5%;
+            padding: 0 5%;
+            height: 80px;
             position: fixed;
             width: 100%;
             top: 0;
@@ -102,6 +103,10 @@
         }
 
         .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            height: 100%;
             font-family: var(--font-heading);
             font-size: 1.5rem;
             font-weight: 900;
@@ -110,6 +115,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
+        }
+
+        .logo-img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            mix-blend-mode: screen;
         }
 
         .back-btn {
@@ -407,7 +419,10 @@
     </div>
 
     <header>
-        <div class="logo">SiteCraft</div>
+        <div class="logo">
+            <img src="images/logo.png" alt="SiteCraft Logo" class="logo-img">
+            <span>SiteCraft</span>
+        </div>
         <a href="index.html" class="back-btn">&larr; Back to Order</a>
     </header>
 
