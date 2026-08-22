@@ -89,39 +89,41 @@
         }
 
         /* Header & Navigation */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 5%;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--glass-border);
-        }
+      header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%; /* Changed vertical padding from 1rem to 0 */
+    height: 80px; /* Fixed height for the header navigation bar */
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--glass-border);
+}
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-family: var(--font-heading);
-            font-size: 1.8rem;
-            font-weight: 900;
-            letter-spacing: 2px;
-            background: linear-gradient(45deg, #fff, var(--accent-orange));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-        }
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    height: 100%; /* Spans full height of header */
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(45deg, #fff, var(--accent-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
 
-        .logo-img {
-            height: 70px;
-            width: auto;
-            object-fit: contain;
-            mix-blend-mode: screen;
-        }
+.logo-img {
+    height: 100%; /* Fits edge-to-edge top-to-bottom */
+    width: auto;
+    object-fit: contain;
+    mix-blend-mode: screen; /* Keeps background seamlessly invisible on dark theme */
+}
 
         nav a {
             color: var(--text-main);
