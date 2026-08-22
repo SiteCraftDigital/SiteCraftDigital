@@ -300,10 +300,64 @@
             padding: 4rem 5%;
             border-top: 1px solid var(--glass-border);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 2rem;
             color: var(--text-muted);
             font-size: 0.9rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            width: 100%;
+        }
+
+        .footer-brand h4,
+        .footer-contact h4,
+        .footer-socials h4 {
+            font-family: var(--font-heading);
+            color: var(--text-main);
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-titles {
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }
+
+        .footer-contact a,
+        .footer-socials a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+
+        .footer-contact a:hover,
+        .footer-socials a:hover {
+            color: var(--accent-orange);
+        }
+
+        .footer-socials-links {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 2rem;
+            width: 100%;
         }
 
         @media (max-width: 900px) {
@@ -311,6 +365,11 @@
                 grid-template-columns: 1fr;
             }
             nav { display: none; }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -430,8 +489,30 @@
     </main>
 
     <footer>
-        <div>&copy; 2026 SiteCraft Digital. All Rights Reserved.</div>
-        <div>Crafting Extraordinary Web Experiences.</div>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h4>SiteCraft Digital</h4>
+                <p>Crafting Extraordinary Web Experiences.</p>
+                <div class="footer-titles">Qualified Full-Stack Developers & UI/UX Engineers</div>
+            </div>
+            <div class="footer-contact">
+                <h4>Contact Us</h4>
+                <a href="tel:0646806036">Phone: 064 680 6036</a>
+                <a href="mailto:info@sitecraft.co.za">Email: info@sitecraft.co.za</a>
+            </div>
+            <div class="footer-socials">
+                <h4>Follow Us</h4>
+                <div class="footer-socials-links">
+                    <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://twitter.com" target="_blank" rel="noopener">Twitter / X</a>
+                    <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+                    <a href="https://facebook.com" target="_blank" rel="noopener">Facebook</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2026 SiteCraft Digital. All Rights Reserved.</div>
+        </div>
     </footer>
 
    <script>
