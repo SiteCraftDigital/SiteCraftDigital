@@ -218,6 +218,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .addon-option:hover {
@@ -232,6 +234,18 @@
         .addon-option.selected {
             border-color: var(--accent-cyan);
             background: rgba(0, 242, 254, 0.08);
+        }
+
+        .addon-icon {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .addon-option:hover .addon-icon,
+        .addon-option.selected .addon-icon {
+            color: var(--accent-orange);
         }
 
         .addon-name {
@@ -527,28 +541,98 @@
                 </div>
             </div>
 
+            <h3 class="addons-title">Select Website Add-Ons</h3>
+            <div class="addons-grid">
+                <label class="addon-option" onclick="toggleFeatureAddon(500, this)">
+                    <input type="checkbox" name="feature_addon" value="500">
+                    <i class="fa-solid fa-headset addon-icon"></i>
+                    <span class="addon-name">Live Chat & Support</span>
+                    <span class="addon-price">+R500</span>
+                </label>
+
+                <label class="addon-option" onclick="toggleFeatureAddon(450, this)">
+                    <input type="checkbox" name="feature_addon" value="450">
+                    <i class="fa-solid fa-calendar-check addon-icon"></i>
+                    <span class="addon-name">Lead Gen & Scheduling</span>
+                    <span class="addon-price">+R450</span>
+                </label>
+
+                <label class="addon-option" onclick="toggleFeatureAddon(1200, this)">
+                    <input type="checkbox" name="feature_addon" value="1200">
+                    <i class="fa-solid fa-credit-card addon-icon"></i>
+                    <span class="addon-name">E-Commerce & Payments</span>
+                    <span class="addon-price">+R1,200</span>
+                </label>
+
+                <label class="addon-option" onclick="toggleFeatureAddon(600, this)">
+                    <input type="checkbox" name="feature_addon" value="600">
+                    <i class="fa-solid fa-magnifying-glass-chart addon-icon"></i>
+                    <span class="addon-name">SEO & Performance Booster</span>
+                    <span class="addon-price">+R600</span>
+                </label>
+
+                <label class="addon-option" onclick="toggleFeatureAddon(350, this)">
+                    <input type="checkbox" name="feature_addon" value="350">
+                    <i class="fa-solid fa-chart-line addon-icon"></i>
+                    <span class="addon-name">Analytics & Heatmaps</span>
+                    <span class="addon-price">+R350</span>
+                </label>
+
+                <label class="addon-option" onclick="toggleFeatureAddon(500, this)">
+                    <input type="checkbox" name="feature_addon" value="500">
+                    <i class="fa-solid fa-shield-halved addon-icon"></i>
+                    <span class="addon-name">Security & Auto-Backups</span>
+                    <span class="addon-price">+R500</span>
+                </label>
+
+                <label class="addon-option" onclick="toggleFeatureAddon(400, this)">
+                    <input type="checkbox" name="feature_addon" value="400">
+                    <i class="fa-solid fa-share-nodes addon-icon"></i>
+                    <span class="addon-name">Social & Email Marketing</span>
+                    <span class="addon-price">+R400</span>
+                </label>
+
+                <label class="addon-option" onclick="toggleFeatureAddon(550, this)">
+                    <input type="checkbox" name="feature_addon" value="550">
+                    <i class="fa-solid fa-universal-access addon-icon"></i>
+                    <span class="addon-name">Accessibility & Translation</span>
+                    <span class="addon-price">+R550</span>
+                </label>
+
+                <label class="addon-option" onclick="toggleFeatureAddon(650, this)">
+                    <input type="checkbox" name="feature_addon" value="650">
+                    <i class="fa-solid fa-wand-magic-sparkles addon-icon"></i>
+                    <span class="addon-name">Visual & UI Animations</span>
+                    <span class="addon-price">+R650</span>
+                </label>
+            </div>
+
             <h3 class="addons-title">Select Maintenance Add-On</h3>
             <div class="addons-grid">
                 <label class="addon-option selected" onclick="selectAddon(0, this)">
                     <input type="radio" name="addon" value="0" checked>
+                    <i class="fa-solid fa-ban addon-icon"></i>
                     <span class="addon-name">No Maintenance</span>
                     <span class="addon-price">R0</span>
                 </label>
 
                 <label class="addon-option" onclick="selectAddon(1500, this)">
                     <input type="radio" name="addon" value="1500">
+                    <i class="fa-solid fa-screwdriver-wrench addon-icon"></i>
                     <span class="addon-name">6 Month Maintenance</span>
                     <span class="addon-price">+R1,500</span>
                 </label>
 
                 <label class="addon-option" onclick="selectAddon(2800, this)">
                     <input type="radio" name="addon" value="2800">
+                    <i class="fa-solid fa-gears addon-icon"></i>
                     <span class="addon-name">12 Month Maintenance</span>
                     <span class="addon-price">+R2,800</span>
                 </label>
 
                 <label class="addon-option" onclick="selectAddon(3500, this)">
                     <input type="radio" name="addon" value="3500">
+                    <i class="fa-solid fa-server addon-icon"></i>
                     <span class="addon-name">24 Month Maintenance</span>
                     <span class="addon-price">+R3,500</span>
                 </label>
@@ -620,6 +704,7 @@
 
         let basePrice = 0;
         let selectedAddonPrice = 0;
+        let selectedFeaturesPrice = 0;
 
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -662,20 +747,42 @@
             document.body.style.overflow = 'auto';
         }
 
+        function toggleFeatureAddon(price, element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('selected');
+            } else {
+                element.classList.remove('selected');
+            }
+
+            calculateFeaturesTotal();
+            updateTotal();
+        }
+
+        function calculateFeaturesTotal() {
+            selectedFeaturesPrice = 0;
+            const checkboxes = document.querySelectorAll('input[name="feature_addon"]:checked');
+            checkboxes.forEach(cb => {
+                selectedFeaturesPrice += parseFloat(cb.value);
+            });
+        }
+
         function selectAddon(price, element) {
-            document.querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
+            element.closest('.addons-grid').querySelectorAll('.addon-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
             selectedAddonPrice = price;
             updateTotal();
         }
 
         function updateTotal() {
-            const grandTotal = basePrice + selectedAddonPrice;
+            const grandTotal = basePrice + selectedAddonPrice + selectedFeaturesPrice;
             document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
         }
 
         checkoutBtn.addEventListener('click', async function () {
-            const grandTotal = basePrice + selectedAddonPrice;
+            const grandTotal = basePrice + selectedAddonPrice + selectedFeaturesPrice;
             const totalCents = grandTotal * 100;
             const btn = this;
 
