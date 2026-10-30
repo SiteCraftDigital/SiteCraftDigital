@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteCraft Digital | 4D Architecture Checkout</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome CDN for Modern Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#07060b',
+                            card: 'rgba(18, 16, 28, 0.65)',
+                            orange: '#ff5e36',
+                            purple: '#8a2be2',
+                            cyan: '#00f2fe'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Cinzel', 'serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                        tech: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Three.js CDN for Lightweight Procedural 4D Rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        body {
+            background-color: #07060b;
+            color: #f3f3f8;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            will-change: transform;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(18, 16, 28, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #00f2fe 50%, #ff5e36 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 4D Canvas Background */
+        #webgl-checkout-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Interactive Card States */
+        .addon-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .addon-card:hover {
+            border-color: rgba(255, 94, 54, 0.6);
+            transform: translateY(-2px);
+        }
+        .addon-card.selected {
+            background: rgba(0, 242, 254, 0.08);
+            border-color: #00f2fe;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+        }
+
+        /* Subtle Ambient Glowing Orbs */
+        .ambient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.25;
+            will-change: transform;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07060b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff5e36;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-slate-100 antialiased selection:bg-cyan-500 selection:text-black">
+
+    <!-- Ambient Gradients -->
+    <div class="ambient-orb w-[500px] h-[500px] bg-brand-orange -top-40 -left-40"></div>
+    <div class="ambient-orb w-[600px] h-[600px] bg-brand-purple bottom-0 right-0"></div>
+    <div class="ambient-orb w-[400px] h-[400px] bg-brand-cyan top-1/2 left-1/3"></div>
+
+    <!-- 4D WebGL Background Canvas -->
+    <div id="webgl-checkout-container"></div>
+
+    <!-- Custom Toast Message Engine -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 ease-out glass-panel p-4 rounded-2xl flex items-center gap-3 border-l-4 border-cyan-400 max-w-md">
+        <div class="text-cyan-400 text-xl"><i class="fa-solid fa-circle-info"></i></div>
+        <div id="toast-message" class="text-sm text-gray-200">Notification message</div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="fixed top-0 left-0 w-full z-40 h-20 px-6 lg:px-12 flex justify-between items-center backdrop-blur-md border-b border-white/10 bg-brand-dark/40">
+        <a href="index.html" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-orange via-brand-purple to-brand-cyan p-[1px] transition-transform duration-500 group-hover:rotate-12">
+                <div class="w-full h-full bg-brand-dark rounded-[11px] flex items-center justify-center">
+                    <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+            </div>
+            <span class="font-heading font-extrabold text-xl lg:text-2xl tracking-wider gradient-text uppercase">SiteCraft Digital</span>
+        </a>
+
+        <a href="index.html" class="flex items-center gap-2 text-xs font-tech font-bold uppercase tracking-wider text-gray-300 hover:text-cyan-400 transition-colors">
+            <i class="fa-solid fa-arrow-left text-cyan-400"></i> Back to Design Brief
+        </a>
+    </header>
+
+    <main class="relative z-10 pt-28 pb-20 px-6 lg:px-16 max-w-5xl mx-auto">
+        <div class="glass-panel p-6 sm:p-10 rounded-3xl border border-white/10 relative overflow-hidden">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-8">
+                <div>
+                    <span class="text-xs font-tech text-cyan-400 tracking-widest uppercase">[ Verified Checkout ]</span>
+                    <h1 class="font-heading text-3xl sm:text-4xl font-extrabold mt-1">Order Summary & Payment</h1>
+                </div>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-tech">
+                    <i class="fa-solid fa-lock"></i> 256-Bit Yoco SSL Encryption
+                </div>
+            </div>
+
+            <!-- Client & Package Details Overview -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-5 rounded-2xl bg-white/5 border border-white/10 mb-8">
+                <div>
+                    <span class="text-[10px] font-tech text-gray-400 uppercase tracking-wider block">Selected Package & Add-ons</span>
+                    <span id="display-package" class="text-sm font-bold text-white">Custom Web Project</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="display-base-price" class="text-xs font-tech text-cyan-400 font-semibold">R0</span>
+                        <span id="display-addons-breakdown" class="text-[11px] font-tech text-purple-300 hidden">+ R0 add-ons</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="text-[10px] font-tech text-gray-400 uppercase tracking-wider block">Client Name</span>
+                    <span id="display-name" class="text-sm font-semibold text-gray-200">Valued Client</span>
+                </div>
+                <div>
+                    <span class="text-[10px] font-tech text-gray-400 uppercase tracking-wider block">Client Email</span>
+                    <span id="display-email" class="text-sm font-semibold text-gray-200 truncate block">-</span>
+                </div>
+            </div>
+
+            <!-- FEATURE ADD-ONS GRID -->
+            <div class="mb-10">
+                <h3 class="font-heading text-xl font-bold mb-1 text-cyan-400">Enhance Your Website with Add-Ons</h3>
+                <p class="text-xs text-gray-400 mb-6">Select interactive modules to accelerate marketing, sales, and speed.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    
+                    <!-- Live Chat -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(1000, this)">
+                        <input type="checkbox" name="feature_addon" value="1000" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-headset text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R1,000</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Live Chat & Support</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Real-time visitor chat integration.</div>
+                        </div>
+                    </div>
+
+                    <!-- Lead Gen -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(1500, this)">
+                        <input type="checkbox" name="feature_addon" value="1500" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-calendar-check text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R1,500</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Lead Gen & Scheduling</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Automated booking calendar.</div>
+                        </div>
+                    </div>
+
+                    <!-- E-Commerce -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(1500, this)">
+                        <input type="checkbox" name="feature_addon" value="1500" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-credit-card text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R1,500</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">E-Commerce & Payments</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Online checkout & gateways.</div>
+                        </div>
+                    </div>
+
+                    <!-- SEO -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(2000, this)">
+                        <input type="checkbox" name="feature_addon" value="2000" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-magnifying-glass-chart text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R2,000</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">SEO & Performance Booster</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Rank higher on search engines.</div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(800, this)">
+                        <input type="checkbox" name="feature_addon" value="800" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-chart-line text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R800</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Analytics & Heatmaps</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Deep visitor behavior tracking.</div>
+                        </div>
+                    </div>
+
+                    <!-- Security -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(1200, this)">
+                        <input type="checkbox" name="feature_addon" value="1200" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-shield-halved text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R1,200</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Security & Auto-Backups</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Malware defense & cloud backups.</div>
+                        </div>
+                    </div>
+
+                    <!-- Marketing -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(1000, this)">
+                        <input type="checkbox" name="feature_addon" value="1000" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-share-nodes text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R1,000</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Social & Email Marketing</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Newsletter & social integration.</div>
+                        </div>
+                    </div>
+
+                    <!-- Accessibility -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(550, this)">
+                        <input type="checkbox" name="feature_addon" value="550" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-universal-access text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R550</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Accessibility & Translation</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">WCAG compliance & multi-language.</div>
+                        </div>
+                    </div>
+
+                    <!-- UI Animations -->
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="toggleFeatureAddon(1000, this)">
+                        <input type="checkbox" name="feature_addon" value="1000" class="hidden">
+                        <div class="flex items-center justify-between mb-3">
+                            <i class="fa-solid fa-wand-magic-sparkles text-2xl text-cyan-400"></i>
+                            <span class="text-xs font-tech text-gray-400">+R1,000</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm">Visual & UI Animations</div>
+                            <div class="text-[11px] text-gray-400 mt-0.5">Custom micro-interactions.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- MAINTENANCE ADD-ONS RADIO -->
+            <div class="mb-10">
+                <h3 class="font-heading text-xl font-bold mb-1 text-cyan-400">Select Maintenance Plan</h3>
+                <p class="text-xs text-gray-400 mb-6">Keep your website secure, updated, and fast with continuous engineering care.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    
+                    <div class="addon-card selected p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="selectMaintenanceAddon(0, this)">
+                        <input type="radio" name="addon" value="0" checked class="hidden">
+                        <i class="fa-solid fa-ban text-2xl text-gray-400 mb-3"></i>
+                        <div>
+                            <div class="font-bold text-sm">No Maintenance</div>
+                            <div class="text-xs font-tech text-gray-400 mt-1">R0</div>
+                        </div>
+                    </div>
+
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="selectMaintenanceAddon(1500, this)">
+                        <input type="radio" name="addon" value="1500" class="hidden">
+                        <i class="fa-solid fa-screwdriver-wrench text-2xl text-cyan-400 mb-3"></i>
+                        <div>
+                            <div class="font-bold text-sm">6 Months Maintenance</div>
+                            <div class="text-xs font-tech text-cyan-400 mt-1">+R1,500</div>
+                        </div>
+                    </div>
+
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="selectMaintenanceAddon(2800, this)">
+                        <input type="radio" name="addon" value="2800" class="hidden">
+                        <i class="fa-solid fa-gears text-2xl text-purple-400 mb-3"></i>
+                        <div>
+                            <div class="font-bold text-sm">12 Months Maintenance</div>
+                            <div class="text-xs font-tech text-purple-400 mt-1">+R2,800</div>
+                        </div>
+                    </div>
+
+                    <div class="addon-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between" onclick="selectMaintenanceAddon(3500, this)">
+                        <input type="radio" name="addon" value="3500" class="hidden">
+                        <i class="fa-solid fa-server text-2xl text-orange-400 mb-3"></i>
+                        <div>
+                            <div class="font-bold text-sm">24 Months Maintenance</div>
+                            <div class="text-xs font-tech text-orange-400 mt-1">+R3,500</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TOTAL AMOUNT BAR -->
+            <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+                <div>
+                    <span class="text-xs font-tech uppercase tracking-widest text-gray-400">Total Investment Due</span>
+                    <div id="display-total" class="font-heading text-4xl font-black text-brand-orange">R0</div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="terms-checkbox" class="w-5 h-5 rounded accent-brand-orange cursor-pointer">
+                    <label for="terms-checkbox" class="text-xs text-gray-300 cursor-pointer">
+                        I agree to the <span class="text-cyan-400 underline" onclick="openModal()">Terms & Conditions</span> and <span class="text-cyan-400 underline" onclick="openModal()">Refund Policy</span>.
+                    </label>
+                </div>
+            </div>
+
+            <button id="checkout-btn" disabled 
+                class="w-full py-4 rounded-2xl bg-gradient-to-r from-brand-orange via-brand-purple to-brand-cyan text-white font-bold tracking-widest uppercase text-sm shadow-xl disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-[0_0_30px_rgba(255,94,54,0.4)] transition-all duration-300">
+                Complete Payment via Yoco
+            </button>
+        </div>
+    </main>
+
+    <!-- TERMS MODAL OVERLAY -->
+    <div id="termsModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-4xl h-[80vh] rounded-3xl flex flex-col overflow-hidden border border-white/20">
+            <div class="p-4 bg-brand-dark/90 border-b border-white/10 flex justify-between items-center">
+                <span class="font-heading font-bold text-sm">Terms & Conditions Agreement</span>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <iframe src="terms_and_conditions.html" class="w-full flex-1 border-none bg-white"></iframe>
+            <div class="p-4 bg-brand-dark/90 border-t border-white/10 flex justify-end">
+                <button onclick="closeModal()" class="px-6 py-2 rounded-full bg-gradient-to-r from-brand-orange to-brand-purple text-xs font-bold uppercase tracking-wider">Close Window</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 border-t border-white/10 pt-12 pb-10 px-6 lg:px-16 bg-brand-dark/90 backdrop-blur-lg">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center text-xs text-gray-400 gap-4">
+            <div>&copy; 2026 SiteCraft Digital. All Rights Reserved.</div>
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-cyan-400"></i> Secured by Yoco Payment Gateway
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC & 4D THREE.JS WEBGL ENGINE -->
+    <script>
+        const pricingMap = {
+            'landing-page': { name: 'Landing Page / Single Page', price: 500 },
+            'corporate': { name: 'Business / Corporate Website', price: 2200 },
+            'portfolio': { name: 'Personal Portfolio', price: 800 },
+            'e-commerce': { name: 'E-Commerce / Online Store', price: 2500 },
+            'custom': { name: 'Custom Web Application', price: 3000 }
+        };
+
+        const RENDER_BACKEND_URL = 'https://sitecraftdigital.onrender.com/create-checkout';
+
+        let basePrice = 0;
+        let selectedAddonPrice = 0;
+        let selectedFeaturesPrice = 0;
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            
+            toastMsg.textContent = message;
+            toast.classList.remove('border-cyan-400', 'border-red-500');
+            toast.classList.add(isError ? 'border-red-500' : 'border-cyan-400');
+            
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-32', 'opacity-0');
+            }, 4000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            const clientName = urlParams.get('fullname') || 'Valued Client';
+            const clientEmail = urlParams.get('email') || '-';
+            const projectType = urlParams.get('project-type') || 'landing-page';
+
+            document.getElementById('display-name').textContent = clientName;
+            document.getElementById('display-email').textContent = clientEmail;
+
+            if (pricingMap[projectType]) {
+                document.getElementById('display-package').textContent = pricingMap[projectType].name;
+                basePrice = pricingMap[projectType].price;
+            } else {
+                document.getElementById('display-package').textContent = 'Custom Web Project';
+                basePrice = 500;
+            }
+
+            document.getElementById('display-base-price').textContent = `R${basePrice.toLocaleString()}`;
+            updateTotal();
+        });
+
+        // Addon Toggle Functions
+        function toggleFeatureAddon(price, element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('selected');
+            } else {
+                element.classList.remove('selected');
+            }
+
+            calculateFeaturesTotal();
+            updateTotal();
+        }
+
+        function calculateFeaturesTotal() {
+            selectedFeaturesPrice = 0;
+            const checkboxes = document.querySelectorAll('input[name="feature_addon"]:checked');
+            checkboxes.forEach(cb => {
+                selectedFeaturesPrice += parseFloat(cb.value);
+            });
+        }
+
+        function selectMaintenanceAddon(price, element) {
+            element.parentElement.querySelectorAll('.addon-card').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+            selectedAddonPrice = price;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const addOnsTotal = selectedAddonPrice + selectedFeaturesPrice;
+            const grandTotal = basePrice + addOnsTotal;
+
+            // Update bottom grand total
+            document.getElementById('display-total').textContent = `R${grandTotal.toLocaleString()}`;
+
+            // Dynamically update top summary price & add-on breakdown
+            const basePriceElem = document.getElementById('display-base-price');
+            const breakdownElem = document.getElementById('display-addons-breakdown');
+
+            basePriceElem.textContent = `Base: R${basePrice.toLocaleString()}`;
+
+            if (addOnsTotal > 0) {
+                breakdownElem.textContent = `+ Add-ons: R${addOnsTotal.toLocaleString()} (Total: R${grandTotal.toLocaleString()})`;
+                breakdownElem.classList.remove('hidden');
+            } else {
+                breakdownElem.classList.add('hidden');
+            }
+        }
+
+        // Terms and Modal Controls
+        const termsCheckbox = document.getElementById('terms-checkbox');
+        const checkoutBtn = document.getElementById('checkout-btn');
+
+        termsCheckbox.addEventListener('change', function() {
+            checkoutBtn.disabled = !this.checked;
+        });
+
+        function openModal() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('termsModal').style.display = 'none';
+        }
+
+        // Checkout Button Action to Yoco
+        checkoutBtn.addEventListener('click', async function () {
+            const grandTotal = basePrice + selectedAddonPrice + selectedFeaturesPrice;
+            const totalCents = grandTotal * 100;
+            const btn = this;
+
+            if (grandTotal <= 0) {
+                showToast('Invalid payment amount.', true);
+                return;
+            }
+
+            const currentOrigin = window.location.origin;
+            const isGitHubPages = currentOrigin.includes('github.io');
+            const repoPath = isGitHubPages ? '/SiteCraftDigital' : '';
+            
+            const absoluteSuccessUrl = `${currentOrigin}${repoPath}/success.html`;
+            const absoluteCancelUrl = `${currentOrigin}${repoPath}/cancel.html`;
+
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Connecting to Yoco Gateway...';
+
+                const response = await fetch(RENDER_BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amountInCents: totalCents,
+                        currency: 'ZAR',
+                        successUrl: absoluteSuccessUrl,
+                        cancelUrl: absoluteCancelUrl
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    showToast('Failed to initiate checkout: ' + (data.message || data.error || 'Server error'), true);
+                    btn.disabled = false;
+                    btn.textContent = 'Complete Payment via Yoco';
+                }
+            } catch (err) {
+                showToast('Connection error: ' + err.message, true);
+                btn.disabled = false;
+                btn.textContent = 'Complete Payment via Yoco';
+            }
+        });
+
+        // -------------------------------------------------------------
+        // 4D ARCHITECTURAL CANVAS ENGINE (LIGHTWEIGHT PROCEDURAL WEBGL)
+        // -------------------------------------------------------------
+        let scene, camera, renderer, hyperGroup;
+
+        function init4DCheckoutCanvas() {
+            const container = document.getElementById('webgl-checkout-container');
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 10;
+
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            hyperGroup = new THREE.Group();
+
+            // Lightweight Double Hyper-Mesh Structure
+            const geoOuter = new THREE.IcosahedronGeometry(4, 1);
+            const geoInner = new THREE.IcosahedronGeometry(2, 1);
+
+            const matWire = new THREE.LineBasicMaterial({ color: 0x8a2be2, transparent: true, opacity: 0.25 });
+
+            const outerMesh = new THREE.LineSegments(new THREE.WireframeGeometry(geoOuter), matWire);
+            const innerMesh = new THREE.LineSegments(new THREE.WireframeGeometry(geoInner), matWire);
+
+            hyperGroup.add(outerMesh);
+            hyperGroup.add(innerMesh);
+            scene.add(hyperGroup);
+
+            // Responsive listener
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        let clock = new THREE.Clock();
+        function animate4DCheckout() {
+            requestAnimationFrame(animate4DCheckout);
+
+            const t = clock.getElapsedTime() * 0.4;
+            if (hyperGroup) {
+                hyperGroup.rotation.x = t * 0.3;
+                hyperGroup.rotation.y = t * 0.5;
+                const scalePulse = Math.sin(t) * 0.15 + 1.0;
+                hyperGroup.scale.set(scalePulse, scalePulse, scalePulse);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function() {
+            init4DCheckoutCanvas();
+            animate4DCheckout();
+        };
+    </script>
+</body>
+</html>
